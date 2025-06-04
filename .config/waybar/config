@@ -1,0 +1,162 @@
+{
+    "height": 39, 
+    "layer": "top",
+    "position": "top",
+    "output": "DP-1",
+    "spacing": 7,
+
+    
+    "modules-left": ["cpu", "temperature", "tray"],
+    "modules-center": ["custom/launcher"],
+    "modules-right": ["custom/weather", "wireplumber", "network", "clock", "hyprland/language", "custom/powermenu"],
+
+    "wlr/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "on-click": "activate",
+        "on-scroll-up": "hyprctl dispatch workspace e+1",
+        "on-scroll-down": "hyprctl dispatch workspace e-1",
+        "persistent_workspaces": {
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": [],
+            "8": [],
+            "9": [],
+            "10": []
+        }
+    },
+    
+"custom/weather": {
+    "format": "{}°",
+    "tooltip": true,
+    "interval": 3600,
+    "exec": "wttrbar --hide-conditions",
+    "return-type": "json"
+},
+
+    "custom/launcher": {
+        "interval": "once",
+        "format": "",
+        "on-click": "wofi --show drun --columns 2 -I -s ~/.config/wofi/style.css",
+        "tooltip": false
+      },
+
+    "cpu": {
+      "interval": 10,
+      "format": " {usage}%",
+      "max-length": 10
+    },
+
+    "temperature": {
+        "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
+	"input-filename": "temp1_input",
+	"format": " {temperatureC}°C",
+	"on-click": "psensor"          
+    },
+
+    "backlight": {
+        "device": "acpi_video0",
+	"max-length": "4",
+        "format": "{icon}  {percent}%",
+        "format-icons": ["", "", "", "", "", "", "", "", ""],
+        "on-click": "",
+        "on-scroll-up": "brightnessctl set 10%-",
+        "on-scroll-down": "brightnessctl set +10%"
+    },
+
+    "wireplumber": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon} {volume}% {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click-right": "pavucontrol",
+	    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-middle": "helvum",
+        "tooltip": false
+        
+    },
+
+"network": {
+    "format": "{ifname}",
+    "format-wifi":"󰖩 {signalStrength}%",
+    "format-ethernet": "{ipaddr}/{cidr} 󰊗",
+    "format-disconnected": "", //An empty format will hide the module.
+    "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
+    "tooltip-format-ethernet": "{ifname} ",
+    "tooltip-format-disconnected": "Disconnected",
+    "max-length": 50
+    },
+
+    "battery": {
+      "bat": "BAT0",
+      "adapter": "ADP0",
+      "interval": 60,
+      "states": {
+          "warning": 30,
+          "critical": 15
+      },
+      "max-length": 20,
+      "format": "{icon}  {capacity}%",
+      "format-warning": "{icon}  {capacity}%",
+      "format-critical": "{icon}  {capacity}%",
+      "format-charging": "  {capacity}%",
+      "format-plugged": "  {capacity}%",
+      "format-alt": "{icon}  {time}",
+      "format-full": "  {capacity}%",
+      "format-icons": [" ", " ", " ", " ", " "]
+    },
+
+    "clock": {
+        "format-alt": " {:%d.%m.%y}",
+        "format": " {:%H:%M}",
+        "tooltip": true ,
+          "tooltip-format": "<tt><small>{calendar}</small></tt>",
+            "calendar": {
+                      "mode"          : "year",
+                      "mode-mon-col"  : 3,
+                      "weeks-pos"     : "",
+                      "on-scroll"     : 1,
+                      "format": {
+                                "months":     "<span color='#ffead3'><b>{}</b></span>",
+                                "days":       "<span color='#ecc6d9'><b>{}</b></span>",
+                                "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
+                                "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
+                                "today":      "<span color='#99ffdd'><b><u>{}</u></b></span>"
+                                }
+                    },
+        "actions":  {
+                    "on-click-right": "mode",
+                    "on-scroll-up": "tz_up",
+                    "on-scroll-down": "tz_down",
+                    "on-scroll-up": "shift_up",
+                    "on-scroll-down": "shift_down"
+                    }
+    },
+
+    "custom/powermenu": {
+        "format": "󰐥",
+        "on-click": "wlogout",
+        "tooltip": false
+    },
+
+    "hyprland/language": {
+    "format": "{}",
+    "format-en": "🇺🇸",
+    "format-ru": "💩🇷🇺",
+    "format-uk": "🇺🇦"
+    }
+}

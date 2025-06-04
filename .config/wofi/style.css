@@ -1,0 +1,48 @@
+@import "/home/vex/.config/hypr/hyprlandconfigs/themes/mocha.css";
+
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 17px;
+    
+    border-radius: 15px;
+}
+
+    window {
+        background-color: @crust;
+        border: 2px solid @overlay2;
+    }
+
+
+        #input {
+            margin: 10px 10px 10px 10px;
+            background-color: @base;
+            color: @subtext1;
+            padding: 5px;
+            box-shadow: none;
+        }
+
+        #inner-box {
+            margin: 0px 10px 0px 10px;
+            background-color: @base;
+        }
+
+        #scroll {
+            border-radius: 0px;
+            margin: 0px 0px 10px 0px;
+        }
+
+        #text {
+            margin: 6px;
+        }
+
+        #entry {
+            border-radius: 15px;
+    
+        }
+
+            #entry:selected {
+                border: 2px solid @overlay2;
+    
+                color: unset;
+                background-color: unset;
+            }

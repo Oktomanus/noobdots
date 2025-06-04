@@ -1,0 +1,20 @@
+mode=drun
+term=foot
+
+
+width=450
+height=420
+location=center
+orientation=vertical
+allow_images=true
+image_size=26
+
+filter_rate=100
+allow_markup=true
+no_actions=true
+halign=fill
+content_halign=fill
+insensitive=true
+# gtk_dark=true
+insensitive=true
+prompt=Search
