@@ -86,7 +86,7 @@ run_cmd "Updating the system" sudo pacman -Syu --noconfirm
 run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
   hyprland hyprlock hypridle hyprshot hyprpicker hyprcursor wl-clipboard sddm xdg-desktop-portal xdg-desktop-portal-hyprland \
   waybar mako swww \
-  yazi foot fastfetch fish rust btop git helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
+  yazi foot fastfetch fish rust btop git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
   cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
   ffmpeg imagemagick bluetui mpd mpc ncmpcpp bottles  \
   nvidia nvidia-utils nvidia-settings cuda libva-nvidia-driver \
