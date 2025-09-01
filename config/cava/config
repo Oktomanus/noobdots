@@ -1,0 +1,57 @@
+[general]
+bars = 80
+framerate = 60
+autosens = 1
+sensitivity = 70
+gravity = 1
+lower_cutoff_freq = 20
+higher_cutoff_freq = 16000
+sleep_timer = 0
+input_delay = 2
+method = pulse
+source = auto
+sample_rate = 44100
+bit_format = 16bit
+channels = stereo
+mono_option = average
+reverse = 0
+bar_delimiter = 0
+output = ncurses
+data_source = mono
+scale = log            ; логарифмическая шкала
+bar_width = 2
+bar_spacing = 1
+
+[color]
+gradient = 1
+gradient_count = 8
+
+gradient_color_1 = '#ff0000'  ; красный
+gradient_color_2 = '#ff9900'  ; оранжевый
+gradient_color_3 = '#ffff00'  ; жёлтый
+gradient_color_4 = '#00ff00'  ; зелёный
+gradient_color_5 = '#00ffff'  ; голубой
+gradient_color_6 = '#0000ff'  ; синий
+gradient_color_7 = '#9900ff'  ; фиолетовый
+gradient_color_8 = '#ff00ff'  ; пурпурный
+
+
+[smoothing]
+integral = 50
+monstercat = 1
+waves = 0
+
+[output]
+channels = stereo
+
+[eq]
+1 = 1
+2 = 1
+3 = 1
+4 = 1
+5 = 1
+6 = 1
+7 = 1
+8 = 1
+9 = 1
+10 = 1
