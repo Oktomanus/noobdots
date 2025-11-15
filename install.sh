@@ -85,7 +85,7 @@ run_cmd "Updating the system" sudo pacman -Syu --noconfirm
 # --- 5. Installing applications ---
 run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
   hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprshot hyprpicker wl-clipboard\
-  waybar mako swww \
+  waybar mako swww ly\
   yazi foot fastfetch fish rust btop git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
   cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
    imagemagick bluetui mpd mpc rmpc \
@@ -99,6 +99,8 @@ run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipe
 
 # --- 6. Shell change, sddm and theme install ---
 run_cmd "Changing shell to fish" chsh -s /usr/bin/fish
+
+run_cmd "Enabling Login Manager" sudo systemcti enable ly
 
 # --- 7. Cloning noobdots and copying configs ---
 print_step "Cloning noobdots repository into home directory"
