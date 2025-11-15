@@ -100,8 +100,6 @@ run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipe
 # --- 6. Shell change, sddm and theme install ---
 run_cmd "Changing shell to fish" chsh -s /usr/bin/fish
 
-run_cmd "Enabling sddm" sudo systemctl enable ly
-
 # --- 7. Cloning noobdots and copying configs ---
 print_step "Cloning noobdots repository into home directory"
 if [ ! -d "$HOME/noobdots" ]; then
