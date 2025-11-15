@@ -7,43 +7,43 @@
 /* Spacing inside the element */
 
 * {
-  font-family: "JetBrainsMono Nerd Font", monospace;
-  font-size: 17px;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 17px;
 }
 
 window#waybar {
-  background-color: @crust;
-  /* background-color: rgba(0, 0, 0, 0.6);*/
-  color: @text;
-  transition-property: background-color;
-  transition-duration: 0.5s;
-  border-radius: 0px;
-  transition-duration: .5s;
-  margin: 16px 16px;
+    background-color: @crust;
+    /* background-color: rgba(0, 0, 0, 0.6);*/
+    color: @text;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-radius: 0px;
+    transition-duration: 0.5s;
+    margin: 16px 16px;
 }
 
 window#waybar.hidden {
-  opacity: 0.2;
+    opacity: 0.2;
 }
 
 #workspaces button {
-  color: @text;
-  background: @background3;
-  border-radius: 8px;
-  padding: 0px 10px 0px 10px;
-  margin: 7px 5px 10px 5px;
-  border: 1px solid @subtext1;
+    color: @text;
+    background: @background3;
+    border-radius: 8px;
+    padding: 0px 10px 0px 10px;
+    margin: 7px 5px 10px 5px;
+    border: 1px solid @subtext1;
 }
 
 #workspaces button:hover {
-  background: @surface0;
-  color: @text;
+    background: @surface0;
+    color: @text;
 }
 
 #workspaces button.active {
-  color: @crust;
-  background: @overlay2;
-  border: none; 
+    color: @crust;
+    background: @overlay2;
+    border: none;
 }
 
 #custom-launcher,
@@ -55,77 +55,73 @@ window#waybar.hidden {
 #network,
 #bluetooth,
 #wireplumber,
-#custom-powermenu{
-  padding: 0px 7px;
-  margin: 7px 0px 7px 0px;
-	border-radius: 8px;
-  color: @crust;
+#custom-powermenu {
+    padding: 0px 7px;
+    margin: 7px 0px 7px 0px;
+    border-radius: 8px;
+    color: @crust;
 }
 
 #window,
-
 #custom-launcher {
-  padding: 0px 25px 0px 20px;
-  margin: 7px 0px 7px 20px;
-  background-color: @mauve;
+    padding: 0px 25px 0px 20px;
+    margin: 7px 0px 7px 20px;
+    background-color: @mauve;
 }
 
 #custom-cpuinfo {
-  margin: 7px 0px 7px 7px;
-  background-color: @lavender;
-   
+    margin: 7px 0px 7px 7px;
+    background-color: @lavender;
 }
 
-#bluetooth{
-  background-color: @blue;
+#bluetooth {
+    background-color: @blue;
 }
 
 #backlight {
-  background-color: @sapphire;
+    background-color: @sapphire;
 }
 
 #wireplumber {
-  background-color: @teal;
+    background-color: @teal;
 }
 
 #network {
-  background-color: @green;
+    background-color: @green;
 }
 
 #battery {
-  background-color: @yellow;
+    background-color: @yellow;
 }
 
 #clock {
-  background-color: @peach;
+    background-color: @peach;
 }
 
 #custom-powermenu {
-   margin: 7px 7px 7px 0px;
-   padding: 0px 12px 0px 12px;
-   font-size: 22px;
-   
-  background-color: @maroon;
+    margin: 7px 7px 7px 0px;
+    padding: 0px 12px 0px 12px;
+    font-size: 22px;
+
+    background-color: @maroon;
 }
 
 @keyframes blink {
-  to {
-    background-color: rgba(30, 34, 42, 0.5);
-    color: #abb2bf;
-  }
+    to {
+        background-color: rgba(30, 34, 42, 0.5);
+        color: #abb2bf;
+    }
 }
 
 #battery.critical:not(.charging) {
-  color: #f53c3c;
-  animation-name: blink;
-  animation-duration: 0.5s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
+    color: #f53c3c;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
 }
 
 label:focus {
-  background-color: #000000;
+    background-color: #000000;
 }
-
-

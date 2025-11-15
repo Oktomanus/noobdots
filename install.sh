@@ -84,25 +84,23 @@ run_cmd "Updating the system" sudo pacman -Syu --noconfirm
 
 # --- 5. Installing applications ---
 run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
-  hyprland hyprlock hypridle hyprshot hyprpicker hyprcursor wl-clipboard sddm xdg-desktop-portal xdg-desktop-portal-hyprland \
+  hyprland hyprlock hypridle hyprshot hyprpicker wl-clipboard ly xdg-desktop-portal xdg-desktop-portal-hyprland \
   waybar mako swww \
   yazi foot fastfetch fish rust btop git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
   cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
-  ffmpeg imagemagick bluetui mpd mpc ncmpcpp bottles  \
-  nvidia nvidia-utils nvidia-settings cuda libva-nvidia-driver \
-   mpv wiremix helvum waypaper lazygit nwg-look \
+   imagemagick bluetui mpd mpc rmpc \
+  nvidia nvidia-settings cuda libva-nvidia-driver \
+   mpv wiremix waypaper nwg-look \
   bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji \
-  firefox telegram-desktop steam fragments zed hardinfo flowblade inkscape krita xournalpp gimp gmic gimp-plugin-gmic imv zrythm audacity libreoffice obs-studio
+  firefox telegram-desktop fragments zed shotcut inkscape krita xournalpp gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio
 
 # --- 5.1 Installing AUR packages using paru ---
-run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha
+run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
 
 # --- 6. Shell change, sddm and theme install ---
 run_cmd "Changing shell to fish" chsh -s /usr/bin/fish
 
-run_cmd "Enabling sddm" sudo systemctl enable sddm
-
-run_cmd "Installing SDDM theme" sh -c "$(curl -fsSL https://raw.githubusercontent.com/keyitdev/sddm-astronaut-theme/master/setup.sh)"
+run_cmd "Enabling sddm" sudo systemctl enable ly
 
 # --- 7. Cloning noobdots and copying configs ---
 print_step "Cloning noobdots repository into home directory"

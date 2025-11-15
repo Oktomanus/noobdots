@@ -1,6 +1,6 @@
 [general]
-bars = 80
-framerate = 60
+bars = auto
+framerate = 75
 autosens = 1
 sensitivity = 70
 gravity = 1
@@ -24,16 +24,11 @@ bar_spacing = 1
 
 [color]
 gradient = 1
-gradient_count = 8
+gradient_count = 2
 
-gradient_color_1 = '#ff0000'  ; красный
-gradient_color_2 = '#ff9900'  ; оранжевый
-gradient_color_3 = '#ffff00'  ; жёлтый
-gradient_color_4 = '#00ff00'  ; зелёный
-gradient_color_5 = '#00ffff'  ; голубой
-gradient_color_6 = '#0000ff'  ; синий
-gradient_color_7 = '#9900ff'  ; фиолетовый
-gradient_color_8 = '#ff00ff'  ; пурпурный
+gradient_color_1 = '#00ffff'  ; голубой
+gradient_color_2 = '#0000ff'  ; синий
+
 
 
 [smoothing]

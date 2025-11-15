@@ -1,72 +1,99 @@
-#/bin/bash
-# Directories with .desktop files
-DESKTOP_DIRS=( /usr/share/applications ~/.local/share/applications /var/lib/flatpak/exports/share/applications )
+#!/bin/bash
 
-# Cache file path
-CACHE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/applauncher.list"
-COUNT_FILE="${CACHE_FILE}.count"
+# Temporary file for applications list
+TEMP_FILE=$(mktemp)
+trap 'rm -f "$TEMP_FILE"' EXIT
 
-mkdir -p "$(dirname "$CACHE_FILE")"
+# Optimized function to parse .desktop file
+parse_desktop_file() {
+    local file="$1"
+    local name="" exec="" terminal=false in_desktop_entry=false hidden=false
 
-# Temporary file for the current session
-tempfile=$(mktemp)
-declare -A apps
+    while IFS= read -r line; do
+        # Fast section check without regex
+        case "$line" in
+            '[Desktop Entry]')
+                in_desktop_entry=true
+                continue
+                ;;
+            '['*']')
+                in_desktop_entry=false
+                continue
+                ;;
+        esac
 
-# Count the number of .desktop files
-current_count=$(find "${DESKTOP_DIRS[@]}" -type f -name '*.desktop' 2>/dev/null | wc -l)
+        # Only process lines in [Desktop Entry] section
+        if [[ "$in_desktop_entry" == true ]]; then
+            case "$line" in
+                Name=*)
+                    [[ -z "$name" ]] && name="${line#Name=}"
+                    ;;
+                Exec=*)
+                    if [[ -z "$exec" ]]; then
+                        exec="${line#Exec=}"
+                        # Remove field codes like %f, %u etc.
+                        exec="${exec// %f/}" exec="${exec// %F/}" exec="${exec// %u/}" exec="${exec// %U/}"
+                        exec="${exec// %d/}" exec="${exec// %D/}" exec="${exec// %n/}" exec="${exec// %N/}"
+                        exec="${exec// %i/}" exec="${exec// %c/}" exec="${exec// %k/}" exec="${exec// %v/}" exec="${exec// %m/}"
+                        exec="${exec//\"/}"    # remove any stray quotes
+                        exec="${exec%% }"      # remove trailing space
+                    fi
+                    ;;
+                Terminal=true)
+                    terminal=true
+                    ;;
+                Hidden=true|NoDisplay=true)
+                    hidden=true
+                    return  # Early exit for hidden apps
+                    ;;
+            esac
+        fi
+    done < "$file"
 
-# Check if cache needs to be updated
-needs_update=false
-if [[ ! -f "$CACHE_FILE" || ! -f "$COUNT_FILE" ]]; then
-    needs_update=true
-else
-    old_count=$(<"$COUNT_FILE")
-    [[ "$old_count" -ne "$current_count" ]] && needs_update=true
-fi
+    # Add terminal wrapper for terminal applications
+    if [[ "$terminal" == true && "$exec" != *"foot"* && "$exec" != *"alacritty"* && "$exec" != *"kitty"* && "$exec" != *"gnome-terminal"* ]]; then
+        exec="foot -e $exec"
+    fi
 
-# If the cache is outdated — recreate it
-if $needs_update; then
-    : > "$tempfile"
-    for dir in "${DESKTOP_DIRS[@]}"; do
-        [[ -d "$dir" ]] || continue
-        while IFS= read -r -d '' file; do
-            output=$(awk -F= '
-                /^Name=/ && !name_set { name=$2; name_set=1 }
-                /^Exec=/ && !exec_set { exec=$2; exec_set=1 }
-                END {
-                    gsub(/ *%[fFuUdDnNickvm]/, "", exec)
-                    gsub(/ +$/, "", exec)
-                    if (name && exec) print name "\t" exec
-                }
-            ' "$file")
-            name=$(cut -f1 <<< "$output")
-            cmd=$(cut -f2 <<< "$output")
-            if [[ -n "$name" && -n "$cmd" && -z "${apps[$name]}" ]]; then
-                apps["$name"]="$cmd"
-                echo -e "$name\t$cmd" >> "$tempfile"
-            fi
-        done < <(find "$dir" -type f -name '*.desktop' -print0 2>/dev/null)
+    # Output if valid and not hidden
+    if [[ -n "$name" && -n "$exec" && "$hidden" == false ]]; then
+        printf "%s\t%s\n" "$name" "$exec"
+    fi
+}
+
+echo "Scanning applications..." >&2
+
+# Optimized find with more exclusions
+declare -a desktop_files
+mapfile -t desktop_files < <(find /usr/share/applications ~/.local/share/applications /var/lib/flatpak/exports/share/applications \
+    -type f -name "*.desktop" ! -name "*mimeinfo*" ! -name ".*" ! -name "*-usercreated*" 2>/dev/null)
+
+# Fast sorting with C locale
+{
+    for desktop_file in "${desktop_files[@]}"; do
+        [[ -r "$desktop_file" && -s "$desktop_file" ]] && parse_desktop_file "$desktop_file"
     done
-    mv "$tempfile" "$CACHE_FILE"
-    echo "$current_count" > "$COUNT_FILE"
-    tempfile="$CACHE_FILE" # read the list directly from cache
-else
-    cp "$CACHE_FILE" "$tempfile"
-fi
+} | LC_ALL=C sort -u > "$TEMP_FILE"
 
-# Selection menu via fzf
-selected=$(cut -f1 "$tempfile" | fzf \
-    --height=40% \
+echo "Found $(wc -l < "$TEMP_FILE") applications" >&2
+
+# Show selection menu
+selected=$(cut -f1 "$TEMP_FILE" | fzf \
+    --height=100% \
     --reverse \
-    --prompt="▶ " \
+    --prompt="  " \
     --border \
-    --ansi
+    --preview-window=hidden \
+    --pointer="➤"
 )
 
-# Run the selected application
+# Launch selected application
 if [[ -n "$selected" ]]; then
-    cmd=$(awk -F'\t' -v sel="$selected" '$1 == sel { print $2; exit }' "$tempfile")
-    setsid $cmd >/dev/null 2>&1 &
+    command=$(awk -F'\t' -v app="$selected" '$1 == app {print $2; exit}' "$TEMP_FILE")
+    if [[ -n "$command" ]]; then
+        echo "Launching: $selected" >&2
+        # Robust launch — supports commands with arguments and special chars
+        setsid nohup env bash -lc "cd ~ && exec $command" >/dev/null 2>&1 &
+        disown
+    fi
 fi
-
-rm "$tempfile"

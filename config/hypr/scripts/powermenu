@@ -16,7 +16,7 @@ CHOICE=$(printf "%b\n" \
     --ansi \
     --reverse \
     --prompt=" " \
-    --height=40% \
+    --height=100% \
     --border=none \
     --margin=1 \
     --pointer="➤" \
