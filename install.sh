@@ -84,8 +84,8 @@ run_cmd "Updating the system" sudo pacman -Syu --noconfirm
 
 # --- 5. Installing applications ---
 run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprshot hyprpicker wl-clipboard\
-  waybar mako swww ly\
+  hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard\
+  waybar mako swww grim slurp swappy ly\
   yazi foot fastfetch fish rust btop git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
   cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
    imagemagick bluetui mpd mpc rmpc \
