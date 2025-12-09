@@ -6,7 +6,7 @@
     "spacing": 7,
 
 
-    "modules-left": ["custom/cpuinfo", "tray", "mpd"],
+    "modules-left": ["battery", "custom/cpuinfo", "tray", "mpd"],
     "modules-center": ["custom/launcher"],
     "modules-right": ["custom/weather", "wireplumber", "network", "bluetooth", "clock", "hyprland/language", "custom/powermenu"],
 
@@ -147,13 +147,13 @@
           "critical": 15
       },
       "max-length": 20,
-      "format": "{icon}  {capacity}%",
-      "format-warning": "{icon}  {capacity}%",
-      "format-critical": "{icon}  {capacity}%",
-      "format-charging": "  {capacity}%",
-      "format-plugged": "  {capacity}%",
-      "format-alt": "{icon}  {time}",
-      "format-full": "  {capacity}%",
+      "format": "{icon}{capacity}%",
+      "format-warning": "{icon}{capacity}%",
+      "format-critical": "{icon}{capacity}%",
+      "format-charging": "{capacity}%",
+      "format-plugged": "{capacity}%",
+      "format-alt": "{icon}{time}",
+      "format-full": "{capacity}%",
       "format-icons": [" ", " ", " ", " ", " "]
     },
 
