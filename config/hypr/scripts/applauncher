@@ -1,0 +1,88 @@
+#!/bin/bash
+TEMP_FILE=$(mktemp)
+trap 'rm -f "$TEMP_FILE"' EXIT
+
+parse_desktop_file() {
+    local file="$1"
+
+    local name="" exec="" terminal=false in_desktop_entry=false hidden=false
+    while IFS= read -r line; do
+        case "$line" in
+            '[Desktop Entry]')
+                in_desktop_entry=true
+                continue
+                ;;
+            '['*']')
+                in_desktop_entry=false
+                continue
+                ;;
+        esac
+
+        if [[ "$in_desktop_entry" == true ]]; then
+            case "$line" in
+
+                Name=*)
+                    [[ -z "$name" ]] && name="${line#*=}"
+                    ;;
+                Exec=*)
+                    if [[ -z "$exec" ]]; then
+                        exec="${line#Exec=}"
+
+                        exec="${exec// %f/}" exec="${exec// %F/}" exec="${exec// %u/}" exec="${exec// %U/}"
+                        exec="${exec// %d/}" exec="${exec// %D/}" exec="${exec// %n/}" exec="${exec// %N/}"
+                        exec="${exec// %i/}" exec="${exec// %c/}" exec="${exec// %k/}" exec="${exec// %v/}" exec="${exec// %m/}"
+
+                        exec="${exec%% }"
+                    fi
+                    ;;
+                Terminal=true)
+                    terminal=true
+                    ;;
+                Hidden=true|NoDisplay=true)
+                    hidden=true
+                    ;;
+            esac
+        fi
+    done < "$file"
+
+    if [[ "$terminal" == true && "$exec" != *"foot"* && "$exec" != *"alacritty"* && "$exec" != *"kitty"* && "$exec" != *"gnome-terminal"* ]]; then
+        exec="foot -e $exec"
+    fi
+
+    if [[ -n "$name" && -n "$exec" && "$hidden" == false ]]; then
+        printf "%s\t%s\n" "$name" "$exec"
+    fi
+}
+
+echo "Scanning applications..." >&2
+
+declare -a desktop_files
+mapfile -t desktop_files < <(find /usr/share/applications ~/.local/share/applications /var/lib/flatpak/exports/share/applications /var/lib/snapd/desktop/applications \
+    -type f -name "*.desktop" 2>/dev/null)
+
+{
+    for desktop_file in "${desktop_files[@]}"; do
+        [[ -r "$desktop_file" && -s "$desktop_file" ]] && parse_desktop_file "$desktop_file"
+    done
+} | LC_ALL=C sort -u > "$TEMP_FILE"
+
+echo "Found $(wc -l < "$TEMP_FILE") applications" >&2
+
+selected=$(cut -f1 "$TEMP_FILE" | fzf \
+    --height=100% \
+    --reverse \
+    --prompt=" " \
+    --border \
+    --preview-window=hidden \
+    --pointer="➤"
+)
+
+if [[ -n "$selected" ]]; then
+    command=$(awk -F'\t' -v app="$selected" '$1 == app {print $2; exit}' "$TEMP_FILE")
+
+    if [[ -n "$command" ]]; then
+        echo "Launching: $selected" >&2
+        setsid nohup bash -c "cd ~ && exec $command" >/dev/null 2>&1 &
+        disown
+    fi
+fi

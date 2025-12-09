@@ -1,0 +1,12 @@
+
+[Default Applications]
+
+x-scheme-handler/anytype=anytype.desktop
+
+image/jpeg=imv-dir.desktop
+image/png=imv-dir.desktop
+image/gif=imv-dir.desktop
+image/webp=imv-dir.desktop
+image/heic=imv-dir.desktop
+image/heif=imv-dir.desktop
+image/tiff=imv-dir.desktop
