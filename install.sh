@@ -66,13 +66,13 @@ if grep -q "^#Color" "$CONF_FILE"; then
 fi
 
 # --- 2. Adding line to /etc/fstab ---
-FSTAB_LINE="UUID=23df1d4f-af77-41ce-bac6-0dc5e604511a         /mnt/storage       ext4     defaults 0 2"
-if ! grep -qF "$FSTAB_LINE" /etc/fstab; then
-  print_step "Adding entry to /etc/fstab"
-  echo "$FSTAB_LINE #storage" | sudo tee -a /etc/fstab > /dev/null
-else
-  print_step "Entry for /mnt/storage already exists in /etc/fstab"
-fi
+#FSTAB_LINE="UUID=23df1d4f-af77-41ce-bac6-0dc5e604511a         /mnt/storage       ext4     defaults 0 2"
+#if ! grep -qF "$FSTAB_LINE" /etc/fstab; then
+ # print_step "Adding entry to /etc/fstab"
+ # echo "$FSTAB_LINE #storage" | sudo tee -a /etc/fstab > /dev/null
+#else
+#  print_step "Entry for /mnt/storage already exists in /etc/fstab"
+#fi
 
 # --- 3. Installing reflector and updating mirrors ---
 run_cmd "Installing reflector if not installed" sudo pacman -Sy --noconfirm --needed reflector
