@@ -89,10 +89,10 @@ run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
   yazi foot fastfetch fish rust btop git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
   cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
    imagemagick bluetui mpd mpc rmpc \
-   nvidia nvidia-settings libva-nvidia-driver cuda\
+#   nvidia nvidia-settings libva-nvidia-driver cuda\
    mpv wiremix waypaper nwg-look \
   bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji \
-  firefox telegram-desktop fragments zed shotcut inkscape krita xournalpp gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio
+  firefox telegram-desktop fragments zed shotcut inkscape krita gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio
 
 # --- 5.1 Installing AUR packages using paru ---
 run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
