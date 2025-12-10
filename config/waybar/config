@@ -150,11 +150,13 @@
       "format": "{icon}{capacity}%",
       "format-warning": "{icon}{capacity}%",
       "format-critical": "{icon}{capacity}%",
-      "format-charging": "{capacity}%",
-      "format-plugged": "{capacity}%",
-      "format-alt": "{icon}{time}",
-      "format-full": "{capacity}%",
-      "format-icons": [" ", " ", " ", " ", " "]
+      "format-charging": " {capacity}%",
+      "format-plugged": " {capacity}%",
+      "format-full": " {capacity}%",
+      "format-icons": [" ", " ", " ", " ", " "],
+           "on-click-right": "foot -T  'battop' battop ",
+           "on-click": "foot -T 'powermode' ~/.config/hypr/scripts/powermode"
+
     },
 
     "clock": {
