@@ -86,7 +86,7 @@ run_cmd "Updating the system" sudo pacman -Syu --noconfirm
 run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
   hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard\
   waybar mako swww grim slurp swappy grimblast wf-recorder ly\
-  yazi foot fastfetch fish rust btop battop git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
+  yazi foot fastfetch fish rust btop battop brightnessctl power-profiles-daemon git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g calc timeshift cava lolcat \
   cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
    imagemagick bluetui mpd mpc rmpc \
    mpv wiremix waypaper nwg-look \
@@ -100,7 +100,7 @@ run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipe
 run_cmd "Changing shell to fish" chsh -s /usr/bin/fish
 
 run_cmd "Enabling Login Manager" sudo systemctl enable ly
-
+run_cmd "Enabling Login Manager" sudo systemctl enable power-profiles-daemon
 # --- 7. Cloning noobdots and copying configs ---
 print_step "Cloning noobdots repository into home directory"
 if [ ! -d "$HOME/noobdots" ]; then
