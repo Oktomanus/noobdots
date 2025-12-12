@@ -99,8 +99,8 @@ run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipe
 # --- 6. Shell change, sddm and theme install ---
 run_cmd "Changing shell to fish" chsh -s /usr/bin/fish
 
-run_cmd "Enabling Login Manager" sudo systemctl enable ly
-run_cmd "Enabling Login Manager" sudo systemctl enable power-profiles-daemon
+run_cmd "Enabling Login Manager" sudo systemctl enable ly@tty2.service
+run_cmd "Enabling Login Manager" sudo systemctl disable getty@tty2.service
 # --- 7. Cloning noobdots and copying configs ---
 print_step "Cloning noobdots repository into home directory"
 if [ ! -d "$HOME/noobdots" ]; then
