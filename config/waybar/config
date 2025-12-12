@@ -1,204 +1,220 @@
 {
-    "height": 39,
-    "layer": "top",
-    "position": "top",
-    "output": "DP-1",
-    "spacing": 7,
+  "height": 39,
+  "layer": "top",
+  "position": "top",
+  "output": "eDP-1",
+  "spacing": 7,
 
+  "modules-left": [
+    "battery",
+    "custom/cpuinfo",
+    "tray",
+    "mpd"
+  ],
+  "modules-center": ["custom/launcher"],
+  "modules-right": [
+    "custom/weather",
+    "wireplumber",
+    "network",
+    "bluetooth",
+    "clock",
+    "hyprland/language",
+    "custom/powermenu"
+  ],
 
-    "modules-left": ["battery", "custom/cpuinfo", "tray", "mpd"],
-    "modules-center": ["custom/launcher"],
-    "modules-right": ["custom/weather", "wireplumber", "network", "bluetooth", "clock", "hyprland/language", "custom/powermenu"],
+  "wlr/workspaces": {
+    "disable-scroll": true,
+    "all-outputs": true,
+    "on-click": "activate",
+    "on-scroll-up": "hyprctl dispatch workspace e+1",
+    "on-scroll-down": "hyprctl dispatch workspace e-1",
+    "persistent_workspaces": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": [],
+      "6": [],
+      "7": [],
+      "8": [],
+      "9": [],
+      "10": []
+    }
+  },
 
-    "wlr/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "on-click": "activate",
-        "on-scroll-up": "hyprctl dispatch workspace e+1",
-        "on-scroll-down": "hyprctl dispatch workspace e-1",
-        "persistent_workspaces": {
-            "1": [],
-            "2": [],
-            "3": [],
-            "4": [],
-            "5": [],
-            "6": [],
-            "7": [],
-            "8": [],
-            "9": [],
-            "10": []
-        }
-    },
-
-"custom/weather": {
+  "custom/weather": {
     "format": "{}°",
     "tooltip": true,
     "interval": 3600,
     "exec": "~/.config/waybar/wttrbar --hide-conditions --location kyiv",
     "return-type": "json"
-},
+  },
 
-    "custom/launcher": {
-        "interval": "once",
-        "format": "",
-        "on-click": "foot -T 'applauncher' ~/.config/hypr/scripts/applauncher" ,
-        "tooltip": false
-      },
+  "custom/launcher": {
+    "interval": "once",
+    "format": "",
+    "on-click": "foot -T 'applauncher' ~/.config/hypr/scripts/applauncher",
+    "tooltip": false
+  },
 
-    "custom/cpuinfo": {
+  "custom/cpuinfo": {
     "interval": 5,
     "format": "{}",
     "max-length": 20,
     "tooltip": false,
     "exec": "~/.config/waybar/cpuinfo",
-        "on-click-right": "foot -T 'btop' btop -p 0"
-    },
+    "on-click-right": "foot -T 'btop' btop -p 0"
+  },
 
-"mpd": {
+  "mpd": {
     "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}({elapsedTime:%M:%S}) ",
     "format-disconnected": "",
     "format-stopped": "",
     "interval": 10,
     "consume-icons": {
-        "on": " " // Icon shows only when "consume" is on
+      "on": " " // Icon shows only when "consume" is on
     },
     "random-icons": {
-        "off": "<span color=\"#f53c3c\"></span> ", // Icon grayed out when "random" is off
-        "on": " "
+      "off": "<span color=\"#f53c3c\"></span> ", // Icon grayed out when "random" is off
+      "on": " "
     },
     "repeat-icons": {
-        "on": " "
+      "on": " "
     },
     "single-icons": {
-        "on": "1 "
+      "on": "1 "
     },
     "state-icons": {
-        "paused": "",
-        "playing": ""
+      "paused": "",
+      "playing": ""
     },
 
-"tooltip": false,
-"tooltip-format": "🎵 {title}\n🎤 {artist}",
-  "tooltip-format-stopped": "",         // ← отключает тултип при stopped
-  "tooltip-format-disconnected": "",     // ← отключает тултип при disconnected
+    "tooltip": false,
+    "tooltip-format": "🎵 {title}\n🎤 {artist}",
+    "tooltip-format-stopped": "", // ← отключает тултип при stopped
+    "tooltip-format-disconnected": "", // ← отключает тултип при disconnected
 
-        "on-click": "mpc toggle",
-        "on-click-right": "mpc stop",
-        "on-scroll-up": "mpc volume +2",
-        "on-scroll-down": "mpc volume -2"
-},
+    "on-click": "mpc toggle",
+    "on-click-right": "mpc stop",
+    "on-scroll-up": "mpc volume +2",
+    "on-scroll-down": "mpc volume -2"
+  },
 
-
-    "wireplumber": {
-        "format": "{icon} {volume}%",
-        "format-bluetooth": "{icon} {volume}% {format_source}",
-        "format-bluetooth-muted": " {icon} {format_source}",
-        "format-muted": "  ",
-        "format-icons": {
-            "headphone": "",
-            "hands-free": "",
-            "headset": "",
-            "phone": "",
-            "portable": "",
-            "car": "",
-            "default": ["", "", ""]
-        },
-        "on-click-right": "foot -T 'wiremix' wiremix",
-	    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-        "on-click-middle": "helvum",
-        "tooltip": false
-
+  "wireplumber": {
+    "format": "{icon} {volume}%",
+    "format-bluetooth": "{icon} {volume}% {format_source}",
+    "format-bluetooth-muted": " {icon} {format_source}",
+    "format-muted": "  ",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
     },
+    "on-click-right": "foot -T 'wiremix' wiremix",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "on-click-middle": "helvum",
+    "tooltip": false
+  },
 
-"network": {
+  "network": {
     "format": "{ifname}",
-    "format-wifi":"󰖩 {signalStrength}%",
+    "format-wifi": "󰖩 {signalStrength}%",
     "format-ethernet": "{ipaddr}/{cidr} 󰊗",
-    "format-disconnected": "", //An empty format will hide the module.
+    "format-disconnected": "󰖪  ",
     "tooltip": false,
-        "tooltip-format": "{ifname} via {gwaddr} 󰊗",
-        "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
-        "tooltip-format-ethernet": "{ifname} ",
-        "tooltip-format-disconnected": "Disconnected",
+    "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
+    "tooltip-format-ethernet": "{ifname} ",
+    "tooltip-format-disconnected": "Disconnected",
     "max-length": 50,
-            "on-click-right": "foot -T 'impala' impala"
-        },
+    "on-click-right": "foot -T 'impala' impala"
+  },
 
-        "bluetooth": {
-	// "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
-	"format": "󰂯",
-	"format-disabled": "", // an empty format will hide the module
-	"format-connected": "󰂰 {num_connections}",
+  "bluetooth": {
+    // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
+    "format": "󰂯",
+    "format-disabled": "", // an empty format will hide the module
+    "format-connected": "󰂰 {num_connections}",
     "tooltip": false,
-	    "tooltip-format": "{controller_alias}\t{controller_address}",
-	    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-	    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
-"on-click-right": "foot -T 'bluetui' bluetui"
+    "tooltip-format": "{controller_alias}\t{controller_address}",
+    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+    "on-click-right": "foot -T 'bluetui' bluetui"
+  },
 
-},
-
-
-    "battery": {
-      "bat": "BAT0",
-      "adapter": "ADP0",
-      "interval": 60,
-      "states": {
-          "warning": 30,
-          "critical": 15
-      },
-      "max-length": 20,
-      "format": "{icon}{capacity}%",
-      "format-warning": "{icon}{capacity}%",
-      "format-critical": "{icon}{capacity}%",
-      "format-charging": " {capacity}%",
-      "format-plugged": " {capacity}%",
-      "format-full": " {capacity}%",
-      "format-icons": [" ", " ", " ", " ", " "],
-           "on-click-right": "foot -T  'battop' battop ",
-           "on-click": "foot -T 'powermode' ~/.config/hypr/scripts/powermode"
-
+  "battery": {
+    "bat": "BAT0",
+    "adapter": "ADP0",
+    "interval": 60,
+    "states": {
+      "warning": 30,
+      "critical": 15
     },
+    "max-length": 20,
+    "format": "{icon}{capacity}%",
+    "format-warning": "{icon}{capacity}%",
+    "format-critical": "{icon}{capacity}%",
+    "format-charging": " {capacity}%",
+    "format-plugged": " {capacity}%",
+    "format-full": " {capacity}%",
+    "format-icons": [
+      " ",
+      " ",
+      " ",
+      " ",
+      " "
+    ],
+    "on-click-right": "foot -T  'battop' battop ",
+    "on-click": "foot -T 'powermode' ~/.config/hypr/scripts/powermode"
+  },
 
-    "clock": {
-        "format-alt": " {:%d.%m.%y}",
-        "format": "󰥔 {:%H:%M}",
-        "tooltip": true ,
-          "tooltip-format": "<tt><small>{calendar}</small></tt>",
-            "calendar": {
-                      "mode"          : "year",
-                      "mode-mon-col"  : 3,
-                      "weeks-pos"     : "",
-                      "on-scroll"     : 1,
-                      "format": {
-                                "months":     "<span color='#ffead3'><b>{}</b></span>",
-                                "days":       "<span color='#ecc6d9'><b>{}</b></span>",
-                                "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
-                                "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
-                                "today":      "<span color='#99ffdd'><b><u>{}</u></b></span>"
-                                }
-                    },
-        "actions":  {
-                    "on-click-right": "foot -T 'calcurse' calcurse",
-                    "on-click-middle": "mode",
-                    "on-scroll-up": "tz_up",
-                    "on-scroll-down": "tz_down",
-                    "on-scroll-up": "shift_up",
-                    "on-scroll-down": "shift_down"
-                    },
-                         "on-click-right": "foot -T 'calcurse' calcurse",
-
+  "clock": {
+    "format-alt": " {:%d.%m.%y}",
+    "format": "󰥔 {:%H:%M}",
+    "tooltip": true,
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "year",
+      "mode-mon-col": 3,
+      "weeks-pos": "",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#99ffdd'><b><u>{}</u></b></span>"
+      }
     },
-
-    "custom/powermenu": {
-        "format": "󰐥",
-        "on-click": "foot -T 'powermenu' ~/.config/hypr/scripts/powermenu",
-        "tooltip": false
+    "actions": {
+      "on-click-right": "foot -T 'calcurse' calcurse",
+      "on-click-middle": "mode",
+      "on-scroll-up": "tz_up",
+      "on-scroll-down": "tz_down",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
     },
+    "on-click-right": "foot -T 'calcurse' calcurse"
+  },
 
-    "hyprland/language": {
+  "custom/powermenu": {
+    "format": "󰐥",
+    "on-click": "foot -T 'powermenu' ~/.config/hypr/scripts/powermenu",
+    "tooltip": false
+  },
+
+  "hyprland/language": {
     "format": "{}",
     "format-en": "🇺🇸",
     "format-ru": "🇷🇺",
     "format-uk": "🇺🇦"
-    }
+  }
 }
