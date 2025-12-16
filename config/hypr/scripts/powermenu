@@ -13,6 +13,7 @@ CHOICE=$(printf "%b\n" \
     "${GREEN}  Suspend${RESET}" \
     "󰗽  Logout" \
 | fzf \
+    --no-input \
     --ansi \
     --reverse \
     --prompt=" " \
