@@ -55,7 +55,8 @@ window#waybar.hidden {
 #network,
 #bluetooth,
 #wireplumber,
-#custom-powermenu {
+#custom-powermenu,
+#custom-timer {
     padding: 0px 7px;
     margin: 7px 0px 7px 0px;
     border-radius: 8px;
@@ -96,6 +97,10 @@ window#waybar.hidden {
 
 #clock {
     background-color: @peach;
+}
+
+#custom-timer {
+    background-color: @maroon;
 }
 
 #custom-powermenu {
