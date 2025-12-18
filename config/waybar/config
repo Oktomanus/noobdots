@@ -2,9 +2,9 @@
   "height": 39,
   "layer": "top",
   "position": "top",
-  "output": "DP-1",
+  "output": "eDP-1",
   "spacing": 7,
-  "exclusive": false,
+
   "modules-left": [
     "battery",
     "custom/cpuinfo",
@@ -42,18 +42,6 @@
     }
   },
 
-  "custom/timer": {
-    "exec": "~/.config/hypr/scripts/timer --status --json",
-    "return-type": "json",
-    "interval": 1,
-    "tooltip": false,
-    "on-click": "~/.config/hypr/scripts/timer --add",
-    "on-click-right": "~/.config/hypr/scripts/timer --sub",
-    "on-scroll-up": "~/.config/hypr/scripts/timer --add1",
-    "on-scroll-down": "~/.config/hypr/scripts/timer --sub1"
-  },
-
-
   "custom/weather": {
     "format": "{}°",
     "tooltip": true,
@@ -66,7 +54,19 @@
     "interval": "once",
     "format": "",
     "on-click": "foot -T 'applauncher' ~/.config/hypr/scripts/applauncher",
+    "on-click-right": "~/.config/hypr/scripts/timer --start",
     "tooltip": false
+  },
+
+  "custom/timer": {
+    "exec": "~/.config/hypr/scripts/timer --status --json",
+    "return-type": "json",
+    "interval": 1,
+    "tooltip": false,
+    "on-click": "~/.config/hypr/scripts/timer --add",
+    "on-click-right": "~/.config/hypr/scripts/timer --sub",
+    "on-scroll-up": "~/.config/hypr/scripts/timer --add1",
+    "on-scroll-down": "~/.config/hypr/scripts/timer --sub1"
   },
 
   "custom/cpuinfo": {
