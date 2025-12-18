@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Timer with persisted state, so waybar can poll it.
+# Actions:
+#   --start      Start/reset to 10 minutes.
+#   --add        Add 5 minutes.
+#   --sub        Subtract 5 minutes (not below 0).
+#   --clear      Reset timer.
+#   --status     Show status (default).
+#   --json       JSON output (for waybar return-type=json).
+# Example for waybar:
+#   "custom/timer": {
+#     "exec": "~/.config/hypr/scripts/timer --status --json",
+#     "interval": 1,
+#     "on-click": "~/.config/hypr/scripts/timer --start",
+#     "on-scroll-up": "~/.config/hypr/scripts/timer --add",
+#     "on-scroll-down": "~/.config/hypr/scripts/timer --sub"
+#   }
+
+DEFAULT_DURATION=600   # 10 minutes
+STEP=300               # +/- 5 minutes
+STEP_MINUTE=60         # +/- 1 minute
+
+# Store state in a runtime directory (reset on reboot).
+STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/waybartimer"
+STATE_FILE="$STATE_DIR/state"
+LOCK_FILE="$STATE_DIR/lock"
+
+mkdir -p "$STATE_DIR"
+
+# Lock to avoid concurrent mutations from bar polling + clicks.
+exec 9>"$LOCK_FILE"
+flock -n 9 || { echo "timer: unable to acquire lock" >&2; exit 1; }
+
+END_TIME=0
+NOTIFIED=0
+OUTPUT="plain"
+ACTION="status"
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--start|--add|--add1|--sub|--sub1|--clear|--status] [--json]
+EOF
+}
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --start) ACTION="start" ;;
+      --add) ACTION="add" ;;
+      --add1) ACTION="add1" ;;
+      --sub|--subtract) ACTION="sub" ;;
+      --sub1) ACTION="sub1" ;;
+      --clear|--reset) ACTION="clear" ;;
+      --status|"") ACTION="status" ;;
+      --json) OUTPUT="json" ;;
+      -h|--help) usage; exit 0 ;;
+      *)
+        echo "Unknown flag: $1" >&2
+        usage
+        exit 1
+        ;;
+    esac
+    shift
+  done
+}
+
+load_state() {
+  if [[ -f "$STATE_FILE" ]]; then
+    read -r stored notif <"$STATE_FILE" || true
+    if [[ "$stored" =~ ^[0-9]+$ ]]; then
+      END_TIME="$stored"
+    else
+      END_TIME=0
+    fi
+    if [[ "$notif" == "1" ]]; then
+      NOTIFIED=1
+    else
+      NOTIFIED=0
+    fi
+  fi
+}
+
+save_state() {
+  if (( END_TIME > 0 )); then
+    echo "$END_TIME $NOTIFIED" >"$STATE_FILE"
+  else
+    rm -f "$STATE_FILE"
+  fi
+}
+
+now_seconds() {
+  date +%s
+}
+
+remaining_seconds() {
+  local now
+  now=$(now_seconds)
+  local remaining=$((END_TIME - now))
+  if (( remaining > 0 )); then
+    echo "$remaining"
+  else
+    echo 0
+  fi
+}
+
+format_time() {
+  local total=$1
+  local h m s
+  h=$((total / 3600))
+  m=$(((total % 3600) / 60))
+  s=$((total % 60))
+  if (( h > 0 )); then
+    printf "%02d:%02d:%02d" "$h" "$m" "$s"
+  else
+    printf "%02d:%02d" "$m" "$s"
+  fi
+}
+
+print_status() {
+  local remaining
+  remaining=$(remaining_seconds)
+
+  if (( remaining <= 0 && END_TIME > 0 && NOTIFIED == 0 )); then
+    notify-send -u critical -t 3000 "⏰ Timer" "Time is up"
+    NOTIFIED=1
+    END_TIME=0
+    save_state
+    remaining=0
+  fi
+
+  if (( remaining > 0 )); then
+    local text="$(format_time "$remaining")"
+    if [[ "$OUTPUT" == "json" ]]; then
+      printf '{"text":"%s","class":"running","alt":"running"}\n' "$text"
+    else
+      echo "$text"
+    fi
+  else
+    if [[ "$OUTPUT" == "json" ]]; then
+      printf '{"text":"","class":"idle","alt":"idle"}\n'
+    else
+      echo "ready"
+    fi
+  fi
+}
+
+start_timer() {
+  END_TIME=$(( $(now_seconds) + DEFAULT_DURATION ))
+  NOTIFIED=0
+  save_state
+  echo "Timer started for 10 minutes."
+}
+
+add_time() {
+  local step=${1:-$STEP}
+  local now remaining
+  now=$(now_seconds)
+  remaining=$(remaining_seconds)
+
+  if (( remaining == 0 )); then
+    END_TIME=$(( now + step ))
+  else
+    END_TIME=$(( END_TIME + step ))
+  fi
+  NOTIFIED=0
+  save_state
+  local minutes=$(( step / 60 ))
+  echo "Added ${minutes} min. Remaining: $(format_time "$(remaining_seconds)")"
+}
+
+sub_time() {
+  local step=${1:-$STEP}
+  local now remaining
+  now=$(now_seconds)
+  remaining=$(remaining_seconds)
+
+  if (( remaining == 0 )); then
+    END_TIME=0
+  else
+    END_TIME=$(( END_TIME - step ))
+    if (( END_TIME <= now )); then
+      END_TIME=0
+    fi
+  fi
+  NOTIFIED=0
+  save_state
+  local minutes=$(( step / 60 ))
+  echo "Subtracted ${minutes} min. Remaining: $(format_time "$(remaining_seconds)")"
+}
+
+clear_timer() {
+  END_TIME=0
+  NOTIFIED=0
+  save_state
+  echo "Timer cleared."
+}
+
+parse_args "$@"
+load_state
+
+case "$ACTION" in
+  start) start_timer ;;
+  add) add_time "$STEP" ;;
+  add1) add_time "$STEP_MINUTE" ;;
+  sub) sub_time "$STEP" ;;
+  sub1) sub_time "$STEP_MINUTE" ;;
+  clear) clear_timer ;;
+  status) print_status ;;
+  *) print_status ;;
+esac
+
+# Если действие не status, вывести актуальный статус отдельно для waybar-пингуемого вывода.
+if [[ "$ACTION" != "status" && "$OUTPUT" == "plain" ]]; then
+  print_status
+fi
