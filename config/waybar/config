@@ -11,7 +11,7 @@
     "tray",
     "mpd"
   ],
-  "modules-center": ["custom/launcher"],
+  "modules-center": ["custom/launcher", "custom/timer"],
   "modules-right": [
     "custom/weather",
     "wireplumber",
@@ -54,7 +54,19 @@
     "interval": "once",
     "format": "",
     "on-click": "foot -T 'applauncher' ~/.config/hypr/scripts/applauncher",
+    "on-click-right": "~/.config/hypr/scripts/timer --start",
     "tooltip": false
+  },
+
+  "custom/timer": {
+    "exec": "~/.config/hypr/scripts/timer --status --json",
+    "return-type": "json",
+    "interval": 1,
+    "tooltip": false,
+    "on-click": "~/.config/hypr/scripts/timer --add",
+    "on-click-right": "~/.config/hypr/scripts/timer --sub",
+    "on-scroll-up": "~/.config/hypr/scripts/timer --add1",
+    "on-scroll-down": "~/.config/hypr/scripts/timer --sub1"
   },
 
   "custom/cpuinfo": {
