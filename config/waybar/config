@@ -185,7 +185,8 @@
       " "
     ],
     "on-click-right": "foot -T  'battop' battop ",
-    "on-click": "foot -T 'powermode' ~/.config/hypr/scripts/powermode"
+    "on-click": "foot -T 'powermode' ~/.config/hypr/scripts/powermode",
+    "on-click-middle": "pgrep -x hypridle >/dev/null && (pkill hypridle && notify-send -u low '☕ Caffeine enabled') || (hypridle & notify-send -u low '💤 Sleep enabled')"
   },
 
   "clock": {
