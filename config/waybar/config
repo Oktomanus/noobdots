@@ -139,14 +139,15 @@
   "network": {
     "format": "{ifname}",
     "format-wifi": "󰖩 {signalStrength}%",
-    "format-ethernet": "{ipaddr}/{cidr} 󰊗",
+    "format-ethernet": "{bandwidthTotalBytes} 󰈁",
     "format-disconnected": "󰖪  ",
     "tooltip": false,
-    "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+    "tooltip-format": "{ifname} via {gwaddr} 󰈁",
     "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
     "tooltip-format-ethernet": "{ifname} ",
     "tooltip-format-disconnected": "Disconnected",
     "max-length": 50,
+    "format-alt": " {bandwidthUpBytes} |  {bandwidthDownBytes}",
     "on-click-right": "foot -T 'impala' impala"
   },
 
