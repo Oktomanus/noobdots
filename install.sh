@@ -85,11 +85,11 @@ run_cmd "Updating the system" sudo pacman -Syu --noconfirm
 # --- 5. Installing applications ---
 run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
   hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard\
-  waybar mako swww grim slurp swappy grimblast wf-recorder ly\
+  waybar mako swww grim slurp swappy grimblast kooha ly\
   yazi foot fastfetch fish rust btop battop brightnessctl power-profiles-daemon git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g qalculate-gtk timeshift cava lolcat \
   cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
    imagemagick bluetui mpd mpc rmpc \
-   mpv wiremix waypaper nwg-look \
+   mpv wiremix easyeffects waypaper nwg-look \
   bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji \
   firefox telegram-desktop fragments zed shotcut inkscape krita gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio
 #   nvidia nvidia-settings libva-nvidia-driver cuda\
