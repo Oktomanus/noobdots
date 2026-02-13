@@ -139,7 +139,7 @@
   "network": {
     "format": "{ifname}",
     "format-wifi": "󰖩 {signalStrength}%",
-    "format-ethernet": "{bandwidthTotalBytes} 󰈁",
+    "format-ethernet": "{bandwidthTotalBits} 󰈁",
     "format-disconnected": "󰖪  ",
     "tooltip": false,
     "tooltip-format": "{ifname} via {gwaddr} 󰈁",
@@ -147,7 +147,7 @@
     "tooltip-format-ethernet": "{ifname} ",
     "tooltip-format-disconnected": "Disconnected",
     "max-length": 50,
-    "format-alt": " {bandwidthUpBytes} |  {bandwidthDownBytes}",
+    "format-alt": " {bandwidthUpBits} |  {bandwidthDownBits}",
     "on-click-right": "foot -T 'impala' impala"
   },
 
