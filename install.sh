@@ -95,7 +95,7 @@ run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
 #   nvidia-dkms nvidia-settings libva-nvidia-driver cuda linux-headers(or -zen)\
 # --- 5.1 Installing AUR packages using paru. Pluguins ---
 
-run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
+# run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
 
 run_cmd "Installing Yazi mount plugin" sh -c "yes | ya pkg add yazi-rs/plugins:mount"
 run_cmd "Installing Yazi Chmod plugin" sh -c "yes | ya pkg add yazi-rs/plugins:chmod"
