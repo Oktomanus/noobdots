@@ -92,10 +92,10 @@ run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
    mpv wiremix easyeffects waypaper nwg-look \
   bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji \
   firefox telegram-desktop fragments zed shotcut inkscape krita gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio
-#   nvidia nvidia-settings libva-nvidia-driver cuda\
+#   nvidia-dkms nvidia-settings libva-nvidia-driver cuda\
 # --- 5.1 Installing AUR packages using paru. Pluguins ---
 
-# run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
+run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
 
 run_cmd "Installing Yazi mount plugin" sh -c "yes | ya pkg add yazi-rs/plugins:mount"
 run_cmd "Installing Yazi Chmod plugin" sh -c "yes | ya pkg add yazi-rs/plugins:chmod"
