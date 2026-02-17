@@ -45,7 +45,7 @@
   "custom/launcher": {
     "interval": "once",
     "format": "",
-    "on-click": "$TERMINAL -T 'applauncher' python3 ~/.config/hypr/scripts/applauncher.py",
+    "on-click": "$TERMINAL -T 'applauncher' exec ~/.config/hypr/scripts/applauncher.py",
     "on-click-right": "~/.config/hypr/scripts/timer --start",
     "tooltip": false
   },
