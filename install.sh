@@ -120,15 +120,9 @@ print_step "Copying contents of ~/noobdots/config to ~/.config"
 mkdir -p "$HOME/.config"
 cp -r "$HOME/noobdots/config/"* "$HOME/.config/"
 
-print_step "Making scripts executable"
-chmod +x "$HOME/.config/waybar/cpuinfo.py" "$HOME/.config/waybar/wttrbar"
 
 print_step "Copying wallpapers folder from ~/noobdots to ~/.config"
 cp -r "$HOME/noobdots/wallpapers" "$HOME/.config/"
-
-# --- 8. Adding paths to zoxide ---
-print_step "Adding paths to zoxide"
-zoxide add "$HOME/.config"
 
 print_step "${GREEN}✅ All tasks completed. A reboot is recommended.${NC}"
 
