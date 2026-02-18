@@ -121,7 +121,7 @@ mkdir -p "$HOME/.config"
 cp -r "$HOME/noobdots/config/"* "$HOME/.config/"
 
 print_step "Making scripts executable"
-chmod +x "$HOME/.config/waybar/cpuinfo" "$HOME/.config/waybar/wttrbar"
+chmod +x "$HOME/.config/waybar/cpuinfo.py" "$HOME/.config/waybar/wttrbar"
 
 print_step "Copying wallpapers folder from ~/noobdots to ~/.config"
 cp -r "$HOME/noobdots/wallpapers" "$HOME/.config/"
