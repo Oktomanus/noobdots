@@ -1,133 +1,453 @@
 #!/bin/sh
 
-set -e  # Stop the script on error
+# =============================================================================
+#  Arch Linux Hyprland Installation Script
+#  Automated setup for a complete Hyprland desktop environment
+# =============================================================================
 
-# Color variables
+# -----------------------------------------------------------------------------
+#  Color Variables
+# -----------------------------------------------------------------------------
 GREEN="\033[0;32m"
 YELLOW="\033[1;33m"
 BLUE="\033[1;34m"
 RED="\033[0;31m"
-NC="\033[0m" # No color
+CYAN="\033[0;36m"
+BOLD="\033[1m"
+NC="\033[0m"  # No Color
+
+# -----------------------------------------------------------------------------
+#  Configuration
+# -----------------------------------------------------------------------------
+CHAOTIC_KEY="3056513887B78AEB"
+CHAOTIC_KEYRING_URL="https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst"
+CHAOTIC_MIRRORLIST_URL="https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst"
+PACMAN_CONF="/etc/pacman.conf"
+NOOBDOTS_REPO="https://github.com/Oktomanus/noobdots"
+REFLECTOR_COUNTRIES="Ukraine,Poland,Germany"
+
+# -----------------------------------------------------------------------------
+#  Ask Questions at Script Start
+# -----------------------------------------------------------------------------
+
+echo -e "${CYAN}"
+echo "=============================================="
+echo "   Arch Linux Hyprland Installation Script   "
+echo "=============================================="
+echo -e "${NC}"
+
+echo -e "${YELLOW}This script will configure your Arch Linux system with Hyprland.${NC}"
+echo -e "${YELLOW}If any command fails, you can retry, skip, or abort.${NC}"
+echo ""
+
+# Ask about NVIDIA drivers
+echo -e "${CYAN}NVIDIA Drivers${NC}"
+read -p "Do you have an NVIDIA GPU and want to install drivers? [y/N]: " nvidia_choice
+
+case "$nvidia_choice" in
+  [Yy]*)
+    INSTALL_NVIDIA=true
+    echo -e "${GREEN}NVIDIA drivers will be installed.${NC}"
+    ;;
+  *)
+    INSTALL_NVIDIA=false
+    echo -e "${YELLOW}NVIDIA drivers will be skipped.${NC}"
+    ;;
+esac
+
+echo ""
+
+# Ask about wallpapers
+echo -e "${CYAN}Wallpapers Setup${NC}"
+echo "The noobdots repository includes a wallpapers folder."
+read -p "Download and install wallpapers? [Y/n]: " wallpapers_choice
+
+case "$wallpapers_choice" in
+  [Nn]*)
+    INSTALL_WALLPAPERS=false
+    echo -e "${YELLOW}Wallpapers will be skipped.${NC}"
+    ;;
+  *)
+    INSTALL_WALLPAPERS=true
+    echo -e "${GREEN}Wallpapers will be installed.${NC}"
+    ;;
+esac
+
+echo ""
+echo -e "${CYAN}=== Starting Installation ===${NC}"
+echo ""
+
+# -----------------------------------------------------------------------------
+#  Helper Functions
+# -----------------------------------------------------------------------------
+
+print_banner() {
+  echo -e "${CYAN}"
+  echo "=============================================="
+  echo "   Arch Linux Hyprland Installation Script   "
+  echo "=============================================="
+  echo -e "${NC}"
+}
 
 print_step() {
-  echo -e "${BLUE}==> $1${NC}"
+  echo -e "\n${BLUE}==>${NC} ${BOLD}$1${NC}"
+}
+
+print_success() {
+  echo -e "${GREEN}✓${NC} $1"
 }
 
 print_error() {
-  echo -e "${RED}Error: $1${NC}" >&2
+  echo -e "${RED}✗${NC} ${RED}Error: $1${NC}" >&2
+}
+
+print_warning() {
+  echo -e "${YELLOW}!${NC} ${YELLOW}Warning: $1${NC}" >&2
+}
+
+# -----------------------------------------------------------------------------
+#  Error Handling with Retry Logic
+# -----------------------------------------------------------------------------
+
+handle_command_failure() {
+  local description="$1"
+  shift
+
+  while true; do
+    print_step "$description"
+
+    if "$@"; then
+      print_success "$description completed successfully"
+      return 0
+    fi
+
+    print_error "Command failed: $description"
+    echo ""
+    echo -e "${YELLOW}What would you like to do?${NC}"
+    echo "  [${BOLD}r${NC}] Retry the command"
+    echo "  [${BOLD}s${NC}] Skip and continue"
+    echo "  [${BOLD}a${NC}] Abort the entire script"
+    echo ""
+
+    read -p "Choose an option (r/s/a): " choice
+
+    case "$choice" in
+      [Rr])
+        continue
+        ;;
+      [Ss])
+        print_warning "Skipping: $description"
+        return 0
+        ;;
+      [Aa])
+        print_error "Script aborted by user"
+        exit 1
+        ;;
+      *)
+        print_warning "Invalid option. Please choose r, s, or a."
+        ;;
+    esac
+  done
 }
 
 run_cmd() {
-  description="$1"
+  local description="$1"
   shift
-  print_step "$description"
-  if ! "$@"; then
-    print_error "Failed to execute: $description"
-    exit 1
+  handle_command_failure "$description" "$@"
+}
+
+# -----------------------------------------------------------------------------
+#  Chaotic-AUR Repository Setup
+# -----------------------------------------------------------------------------
+
+setup_chaotic_aur() {
+  print_step "Setting up Chaotic-AUR repository"
+  echo "-------------------------------------------"
+
+  # Import and trust GPG key
+  run_cmd "Importing Chaotic-AUR GPG key" \
+    sudo pacman-key --recv-key "$CHAOTIC_KEY" --keyserver keyserver.ubuntu.com
+
+  run_cmd "Trusting the Chaotic-AUR key" \
+    sudo pacman-key --lsign-key "$CHAOTIC_KEY"
+
+  # Install keyring and mirrorlist
+  run_cmd "Installing chaotic-keyring and chaotic-mirrorlist" \
+    sudo pacman -U --needed --noconfirm "$CHAOTIC_KEYRING_URL" "$CHAOTIC_MIRRORLIST_URL"
+
+  # Add repository to pacman.conf
+  print_step "Configuring $PACMAN_CONF"
+
+  if ! grep -q "^\[chaotic-aur\]" "$PACMAN_CONF"; then
+    {
+      echo ""
+      echo "[chaotic-aur]"
+      echo "Include = /etc/pacman.d/chaotic-mirrorlist"
+    } | sudo tee -a "$PACMAN_CONF" > /dev/null
+    print_success "Added [chaotic-aur] repository"
+  else
+    print_success "[chaotic-aur] repository already configured"
+  fi
+
+  # Enable ILoveCandy
+  if ! grep -q "^ILoveCandy" "$PACMAN_CONF"; then
+    sudo sed -i '/^#Color/i ILoveCandy' "$PACMAN_CONF"
+    print_success "Enabled ILoveCandy"
+  else
+    print_success "ILoveCandy already enabled"
+  fi
+
+  # Configure ParallelDownloads
+  if grep -q "^#ParallelDownloads" "$PACMAN_CONF"; then
+    sudo sed -i 's/^#ParallelDownloads.*/ParallelDownloads = 10/' "$PACMAN_CONF"
+    print_success "Enabled ParallelDownloads = 10"
+  elif grep -q "^ParallelDownloads" "$PACMAN_CONF"; then
+    sudo sed -i 's/^ParallelDownloads.*/ParallelDownloads = 10/' "$PACMAN_CONF"
+    print_success "Updated ParallelDownloads = 10"
+  else
+    sudo sed -i '/^#Color/a ParallelDownloads = 10' "$PACMAN_CONF"
+    print_success "Added ParallelDownloads = 10"
+  fi
+
+  # Enable color output
+  if grep -q "^#Color" "$PACMAN_CONF"; then
+    sudo sed -i 's/^#Color/Color/' "$PACMAN_CONF"
+    print_success "Enabled color output"
+  else
+    print_success "Color output already enabled"
   fi
 }
 
-# --- 1. Chaotic-AUR and pacman setup ---
+# -----------------------------------------------------------------------------
+#  Mirrorlist Update with Reflector
+# -----------------------------------------------------------------------------
 
-run_cmd "Importing GPG key" sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+update_mirrorlist() {
+  print_step "Updating pacman mirrorlist with Reflector"
+  echo "-------------------------------------------"
 
-run_cmd "Trusting the key" sudo pacman-key --lsign-key 3056513887B78AEB
+  run_cmd "Installing reflector" \
+    sudo pacman -Sy --noconfirm --needed reflector
 
-run_cmd "Installing chaotic-keyring and chaotic-mirrorlist" sudo pacman -U --needed --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+  run_cmd "Fetching optimal mirrors for $REFLECTOR_COUNTRIES" \
+    sudo reflector --country "$REFLECTOR_COUNTRIES" --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+}
 
-CONF_FILE="/etc/pacman.conf"
+# -----------------------------------------------------------------------------
+#  System Update
+# -----------------------------------------------------------------------------
 
-print_step "Adding chaotic-aur repository to pacman.conf"
-if ! grep -q "^\[chaotic-aur\]" "$CONF_FILE"; then
-  {
-    echo ""
-    echo "[chaotic-aur]"
-    echo "Include = /etc/pacman.d/chaotic-mirrorlist"
-  } | sudo tee -a "$CONF_FILE" > /dev/null
-fi
+update_system() {
+  print_step "Performing full system update"
+  echo "-------------------------------------------"
 
-print_step "Adding ILoveCandy to pacman.conf"
-if ! grep -q "^ILoveCandy" "$CONF_FILE"; then
-  sudo sed -i '/^#Color/i ILoveCandy' "$CONF_FILE"
-fi
+  run_cmd "Updating all packages" \
+    sudo pacman -Syu --noconfirm
+}
 
-print_step "Setting ParallelDownloads"
-if grep -q "^#ParallelDownloads" "$CONF_FILE"; then
-  sudo sed -i 's/^#ParallelDownloads.*/ParallelDownloads = 10/' "$CONF_FILE"
-elif grep -q "^ParallelDownloads" "$CONF_FILE"; then
-  sudo sed -i 's/^ParallelDownloads.*/ParallelDownloads = 10/' "$CONF_FILE"
-else
-  sudo sed -i '/^#Color/a ParallelDownloads = 10' "$CONF_FILE"
-fi
+# -----------------------------------------------------------------------------
+#  Package Installation
+# -----------------------------------------------------------------------------
 
-print_step "Enabling pacman color output"
-if grep -q "^#Color" "$CONF_FILE"; then
-  sudo sed -i 's/^#Color/Color/' "$CONF_FILE"
-fi
+install_packages() {
+  print_step "Installing packages"
+  echo "-------------------------------------------"
 
-# --- 2. Adding line to /etc/fstab ---
-#FSTAB_LINE="UUID=23df1d4f-af77-41ce-bac6-0dc5e604511a         /mnt/storage       ext4     defaults 0 2"
-#if ! grep -qF "$FSTAB_LINE" /etc/fstab; then
- # print_step "Adding entry to /etc/fstab"
- # echo "$FSTAB_LINE #storage" | sudo tee -a /etc/fstab > /dev/null
-#else
-#  print_step "Entry for /mnt/storage already exists in /etc/fstab"
-#fi
+  # Main package list - Core DE and utilities
+  CORE_PACKAGES="\
+    hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard \
+    waybar mako swww swappy grimblast kooha sddm base-devel udisks2 \
+  "
 
-# --- 3. Installing reflector and updating mirrors ---
-run_cmd "Installing reflector if not installed" sudo pacman -Sy --noconfirm --needed reflector
+  # Terminal and shell tools
+  TERMINAL_PACKAGES="\
+    yazi foot fastfetch fish rust btop battop brightnessctl power-profiles-daemon \
+    git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g \
+    qalculate-gtk cava lolcat \
+  "
 
-run_cmd "Updating mirrorlist using reflector" sudo reflector --country Ukraine,Poland,Germany --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+  # Fun terminal apps
+  FUN_PACKAGES="\
+    cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
+  "
 
-# --- 4. System update ---
-run_cmd "Updating the system" sudo pacman -Syu --noconfirm
+  # Multimedia
+  MEDIA_PACKAGES="\
+    imagemagick bluetui mpd mpc rmpc mpv wiremix easyeffects waypaper nwg-look \
+  "
 
-# --- 5. Installing applications ---
-run_cmd "Installing main application list" sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard\
-  waybar mako swww grim slurp swappy grimblast kooha ly base-devel udisks2\
-  yazi foot fastfetch fish rust btop battop brightnessctl power-profiles-daemon git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g qalculate-gtk cava lolcat \
-  cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
-   imagemagick bluetui mpd mpc rmpc \
-   mpv wiremix easyeffects waypaper nwg-look \
-  bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji \
-  firefox telegram-desktop fragments zed shotcut inkscape krita gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio
-#   nvidia-open nvidia-settings libva-nvidia-driver cuda linux-headers(or -zen)\
-# --- 5.1 Installing AUR packages using paru. Pluguins ---
+  # Fonts and themes
+  FONTS_PACKAGES="\
+    bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd \
+    ttf-dejavu-nerd noto-fonts noto-fonts-emoji \
+  "
 
-run_cmd "Installing anytype and pipes.sh via paru" paru -S --needed anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
+  # Applications
+  APPS_PACKAGES="\
+    firefox telegram-desktop fragments zed shotcut inkscape krita gimp gmic \
+    gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio \
+  "
 
-run_cmd "Installing Yazi mount plugin" sh -c "yes | ya pkg add yazi-rs/plugins:mount"
-run_cmd "Installing Yazi Chmod plugin" sh -c "yes | ya pkg add yazi-rs/plugins:chmod"
+  run_cmd "Installing core desktop environment" \
+    sudo pacman -S --needed --noconfirm $CORE_PACKAGES
 
-# --- 6. Shell change, sddm and theme install ---
-run_cmd "Changing shell to fish" chsh -s /usr/bin/fish
+  run_cmd "Installing terminal and shell tools" \
+    sudo pacman -S --needed --noconfirm $TERMINAL_PACKAGES
 
-run_cmd "Enabling Login Manager" sudo systemctl enable ly@tty2.service
-run_cmd "Enabling Login Manager" sudo systemctl disable getty@tty2.service
-# --- 7. Cloning noobdots and copying configs ---
-print_step "Cloning noobdots repository into home directory"
-if [ ! -d "$HOME/noobdots" ]; then
-  if ! git clone https://github.com/Oktomanus/noobdots "$HOME/noobdots"; then
-    print_error "Failed to clone noobdots repository"
-    exit 1
+  run_cmd "Installing fun terminal apps" \
+    sudo pacman -S --needed --noconfirm $FUN_PACKAGES
+
+  run_cmd "Installing multimedia packages" \
+    sudo pacman -S --needed --noconfirm $MEDIA_PACKAGES
+
+  run_cmd "Installing fonts and themes" \
+    sudo pacman -S --needed --noconfirm $FONTS_PACKAGES
+
+  run_cmd "Installing applications" \
+    sudo pacman -S --needed --noconfirm $APPS_PACKAGES
+
+  # AUR packages via paru
+  AUR_PACKAGES="anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte"
+
+  run_cmd "Installing AUR packages via paru" \
+    paru -S --needed --noconfirm $AUR_PACKAGES
+
+  # Yazi plugins
+  run_cmd "Installing Yazi mount plugin" \
+    sh -c "yes | ya pkg add yazi-rs/plugins:mount"
+
+  run_cmd "Installing Yazi chmod plugin" \
+    sh -c "yes | ya pkg add yazi-rs/plugins:chmod"
+}
+
+# -----------------------------------------------------------------------------
+#  Shell and Display Manager Configuration
+# -----------------------------------------------------------------------------
+
+configure_shell_and_dm() {
+  print_step "Configuring shell and display manager"
+  echo "-------------------------------------------"
+
+  run_cmd "Changing default shell to fish" \
+    chsh -s /usr/bin/fish
+
+  run_cmd "Enabling sddm display manager" \
+    sudo systemctl enable .service
+
+}
+
+# -----------------------------------------------------------------------------
+#  Noobdots Configuration Setup
+# -----------------------------------------------------------------------------
+
+setup_noobdots() {
+  print_step "Setting up noobdots configuration"
+  echo "-------------------------------------------"
+
+  # Clone repository
+  if [ ! -d "$HOME/noobdots" ]; then
+    run_cmd "Cloning noobdots repository" \
+      git clone "$NOOBDOTS_REPO" "$HOME/noobdots"
+  else
+    print_success "noobdots repository already exists"
   fi
-else
-  print_step "noobdots repository already exists"
-fi
 
-print_step "Copying contents of ~/noobdots/config to ~/.config"
-mkdir -p "$HOME/.config"
-cp -r "$HOME/noobdots/config/"* "$HOME/.config/"
+  # Copy config files
+  print_step "Copying configuration files"
+  mkdir -p "$HOME/.config"
+  cp -r "$HOME/noobdots/config/"* "$HOME/.config/"
+  print_success "Configuration files copied to ~/.config"
+}
 
+# -----------------------------------------------------------------------------
+#  Wallpapers Setup
+# -----------------------------------------------------------------------------
 
-print_step "Copying wallpapers folder from ~/noobdots to ~/.config"
-cp -r "$HOME/noobdots/wallpapers" "$HOME/.config/"
+setup_wallpapers() {
+  print_step "Setting up wallpapers"
+  echo "-------------------------------------------"
 
-print_step "${GREEN}✅ All tasks completed. A reboot is recommended.${NC}"
+  if [ -d "$HOME/noobdots/wallpapers" ]; then
+    cp -r "$HOME/noobdots/wallpapers" "$HOME/.config/"
+    print_success "Wallpapers copied to ~/.config/wallpapers"
+  else
+    print_warning "Wallpapers folder not found in noobdots repository"
+  fi
+}
 
-read -p "Reboot now? [Y/n]: " answer
-case "$answer" in
-  [Yy]* ) reboot;;
-  * ) echo "You can reboot later using the 'reboot' command.";;
-esac
+# -----------------------------------------------------------------------------
+#  NVIDIA Driver Installation
+# -----------------------------------------------------------------------------
+
+install_nvidia_drivers() {
+  print_step "Installing NVIDIA drivers"
+  echo "-------------------------------------------"
+
+  NVIDIA_PACKAGES="nvidia-open nvidia-settings libva-nvidia-driver cuda"
+
+  run_cmd "Installing NVIDIA drivers" \
+    sudo pacman -S --needed --noconfirm $NVIDIA_PACKAGES
+
+  print_success "NVIDIA drivers installed"
+}
+
+# -----------------------------------------------------------------------------
+#  Reboot Prompt
+# -----------------------------------------------------------------------------
+
+prompt_reboot() {
+  echo ""
+  echo -e "${GREEN}=============================================="
+  echo "   All tasks completed successfully!${NC}"
+  echo -e "${GREEN}==============================================${NC}"
+  echo ""
+  echo -e "${YELLOW}A reboot is recommended to apply all changes.${NC}"
+  echo ""
+
+  read -p "Reboot now? [Y/n]: " answer
+
+  case "$answer" in
+    [Yy]*)
+      print_success "Rebooting system..."
+      reboot
+      ;;
+    *)
+      echo "You can reboot later using the 'reboot' command."
+      ;;
+  esac
+}
+
+# -----------------------------------------------------------------------------
+#  Main Execution
+# -----------------------------------------------------------------------------
+
+main() {
+  print_banner
+
+  # Execute installation steps
+  setup_chaotic_aur
+  update_mirrorlist
+  update_system
+
+  # Install NVIDIA drivers if user chose yes
+  if [ "$INSTALL_NVIDIA" = true ]; then
+    install_nvidia_drivers
+  fi
+
+  install_packages
+  configure_shell_and_dm
+  setup_noobdots
+
+  # Install wallpapers only if user chose yes
+  if [ "$INSTALL_WALLPAPERS" = true ]; then
+    setup_wallpapers
+  else
+    print_step "Wallpapers"
+    print_warning "Skipping wallpapers installation (user choice)"
+  fi
+
+  prompt_reboot
+}
+
+# Run main function
+main "$@"
