@@ -284,7 +284,7 @@ install_packages() {
 
   # Applications
   APPS_PACKAGES="\
-    firefox telegram-desktop fragments zed shotcut inkscape krita gimp gmic \
+    firefox ayugram-desktop fragments zed shotcut inkscape krita gimp gmic \
     gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio \
   "
 
