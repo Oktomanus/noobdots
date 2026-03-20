@@ -32,7 +32,7 @@ REFLECTOR_COUNTRIES="Ukraine,Poland,Germany"
 
 echo -e "${CYAN}"
 echo "=============================================="
-echo "   Arch Linux Hyprland Installation Script   "
+echo "   Arch Linux Hyprland Installation Script    "
 echo "=============================================="
 echo -e "${NC}"
 
@@ -84,7 +84,7 @@ echo ""
 print_banner() {
   echo -e "${CYAN}"
   echo "=============================================="
-  echo "   Arch Linux Hyprland Installation Script   "
+  echo "   Arch Linux Hyprland Installation Script    "
   echo "=============================================="
   echo -e "${NC}"
 }
@@ -164,18 +164,15 @@ setup_chaotic_aur() {
   print_step "Setting up Chaotic-AUR repository"
   echo "-------------------------------------------"
 
-  # Import and trust GPG key
   run_cmd "Importing Chaotic-AUR GPG key" \
     sudo pacman-key --recv-key "$CHAOTIC_KEY" --keyserver keyserver.ubuntu.com
 
   run_cmd "Trusting the Chaotic-AUR key" \
     sudo pacman-key --lsign-key "$CHAOTIC_KEY"
 
-  # Install keyring and mirrorlist
   run_cmd "Installing chaotic-keyring and chaotic-mirrorlist" \
     sudo pacman -U --needed --noconfirm "$CHAOTIC_KEYRING_URL" "$CHAOTIC_MIRRORLIST_URL"
 
-  # Add repository to pacman.conf
   print_step "Configuring $PACMAN_CONF"
 
   if ! grep -q "^\[chaotic-aur\]" "$PACMAN_CONF"; then
@@ -189,32 +186,21 @@ setup_chaotic_aur() {
     print_success "[chaotic-aur] repository already configured"
   fi
 
-  # Enable ILoveCandy
   if ! grep -q "^ILoveCandy" "$PACMAN_CONF"; then
     sudo sed -i '/^#Color/i ILoveCandy' "$PACMAN_CONF"
     print_success "Enabled ILoveCandy"
-  else
-    print_success "ILoveCandy already enabled"
   fi
 
-  # Configure ParallelDownloads
   if grep -q "^#ParallelDownloads" "$PACMAN_CONF"; then
     sudo sed -i 's/^#ParallelDownloads.*/ParallelDownloads = 10/' "$PACMAN_CONF"
     print_success "Enabled ParallelDownloads = 10"
   elif grep -q "^ParallelDownloads" "$PACMAN_CONF"; then
     sudo sed -i 's/^ParallelDownloads.*/ParallelDownloads = 10/' "$PACMAN_CONF"
-    print_success "Updated ParallelDownloads = 10"
-  else
-    sudo sed -i '/^#Color/a ParallelDownloads = 10' "$PACMAN_CONF"
-    print_success "Added ParallelDownloads = 10"
   fi
 
-  # Enable color output
   if grep -q "^#Color" "$PACMAN_CONF"; then
     sudo sed -i 's/^#Color/Color/' "$PACMAN_CONF"
     print_success "Enabled color output"
-  else
-    print_success "Color output already enabled"
   fi
 }
 
@@ -241,78 +227,38 @@ update_system() {
   print_step "Performing full system update"
   echo "-------------------------------------------"
 
+  # Убран --noconfirm, чтобы вы видели, что обновляется
   run_cmd "Updating all packages" \
-    sudo pacman -Syu --noconfirm
+    sudo pacman -Syu
 }
 
 # -----------------------------------------------------------------------------
-#  Package Installation
+#  Package Installation (Оптимизировано в одну транзакцию)
 # -----------------------------------------------------------------------------
 
 install_packages() {
   print_step "Installing packages"
   echo "-------------------------------------------"
 
-  # Main package list - Core DE and utilities
-  CORE_PACKAGES="\
-    hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard \
-    waybar mako swww swappy grimblast kooha sddm base-devel udisks2 \
-  "
+  CORE_PACKAGES="hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard waybar mako swww swappy grimblast kooha sddm base-devel udisks2"
+  TERMINAL_PACKAGES="yazi foot fastfetch fish rust btop battop brightnessctl power-profiles-daemon git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g qalculate-gtk cava lolcat"
+  FUN_PACKAGES="cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock"
+  MEDIA_PACKAGES="imagemagick bluetui mpd mpc rmpc mpv wiremix easyeffects waypaper nwg-look"
+  FONTS_PACKAGES="bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji"
+  APPS_PACKAGES="firefox ayugram-desktop fragments zed shotcut inkscape krita gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio"
+  
+  # Объединяем все пакеты для быстрой установки в одну команду. Убран --noconfirm
+  ALL_PACKAGES="$CORE_PACKAGES $TERMINAL_PACKAGES $FUN_PACKAGES $MEDIA_PACKAGES $FONTS_PACKAGES $APPS_PACKAGES"
 
-  # Terminal and shell tools
-  TERMINAL_PACKAGES="\
-    yazi foot fastfetch fish rust btop battop brightnessctl power-profiles-daemon \
-    git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g \
-    qalculate-gtk cava lolcat \
-  "
+  run_cmd "Installing all official repository packages" \
+    sudo pacman -S --needed $ALL_PACKAGES
 
-  # Fun terminal apps
-  FUN_PACKAGES="\
-    cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock \
-  "
-
-  # Multimedia
-  MEDIA_PACKAGES="\
-    imagemagick bluetui mpd mpc rmpc mpv wiremix easyeffects waypaper nwg-look \
-  "
-
-  # Fonts and themes
-  FONTS_PACKAGES="\
-    bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd \
-    ttf-dejavu-nerd noto-fonts noto-fonts-emoji \
-  "
-
-  # Applications
-  APPS_PACKAGES="\
-    firefox ayugram-desktop fragments zed shotcut inkscape krita gimp gmic \
-    gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio \
-  "
-
-  run_cmd "Installing core desktop environment" \
-    sudo pacman -S --needed --noconfirm $CORE_PACKAGES
-
-  run_cmd "Installing terminal and shell tools" \
-    sudo pacman -S --needed --noconfirm $TERMINAL_PACKAGES
-
-  run_cmd "Installing fun terminal apps" \
-    sudo pacman -S --needed --noconfirm $FUN_PACKAGES
-
-  run_cmd "Installing multimedia packages" \
-    sudo pacman -S --needed --noconfirm $MEDIA_PACKAGES
-
-  run_cmd "Installing fonts and themes" \
-    sudo pacman -S --needed --noconfirm $FONTS_PACKAGES
-
-  run_cmd "Installing applications" \
-    sudo pacman -S --needed --noconfirm $APPS_PACKAGES
-
-  # AUR packages via paru
   AUR_PACKAGES="anytype pipes.sh catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte"
 
+  # Убран --noconfirm для AUR пакетов
   run_cmd "Installing AUR packages via paru" \
-    paru -S --needed --noconfirm $AUR_PACKAGES
+    paru -S --needed $AUR_PACKAGES
 
-  # Yazi plugins
   run_cmd "Installing Yazi mount plugin" \
     sh -c "yes | ya pkg add yazi-rs/plugins:mount"
 
@@ -331,9 +277,9 @@ configure_shell_and_dm() {
   run_cmd "Changing default shell to fish" \
     chsh -s /usr/bin/fish
 
+  # Исправлена критическая ошибка: было .service, стало sddm.service
   run_cmd "Enabling sddm display manager" \
-    sudo systemctl enable .service
-
+    sudo systemctl enable sddm.service
 }
 
 # -----------------------------------------------------------------------------
@@ -344,7 +290,6 @@ setup_noobdots() {
   print_step "Setting up noobdots configuration"
   echo "-------------------------------------------"
 
-  # Clone repository
   if [ ! -d "$HOME/noobdots" ]; then
     run_cmd "Cloning noobdots repository" \
       git clone "$NOOBDOTS_REPO" "$HOME/noobdots"
@@ -352,7 +297,6 @@ setup_noobdots() {
     print_success "noobdots repository already exists"
   fi
 
-  # Copy config files
   print_step "Copying configuration files"
   mkdir -p "$HOME/.config"
   cp -r "$HOME/noobdots/config/"* "$HOME/.config/"
@@ -385,8 +329,9 @@ install_nvidia_drivers() {
 
   NVIDIA_PACKAGES="nvidia-open nvidia-settings libva-nvidia-driver cuda"
 
+  # Убран --noconfirm
   run_cmd "Installing NVIDIA drivers" \
-    sudo pacman -S --needed --noconfirm $NVIDIA_PACKAGES
+    sudo pacman -S --needed $NVIDIA_PACKAGES
 
   print_success "NVIDIA drivers installed"
 }
@@ -424,12 +369,10 @@ prompt_reboot() {
 main() {
   print_banner
 
-  # Execute installation steps
   setup_chaotic_aur
   update_mirrorlist
   update_system
 
-  # Install NVIDIA drivers if user chose yes
   if [ "$INSTALL_NVIDIA" = true ]; then
     install_nvidia_drivers
   fi
@@ -438,7 +381,6 @@ main() {
   configure_shell_and_dm
   setup_noobdots
 
-  # Install wallpapers only if user chose yes
   if [ "$INSTALL_WALLPAPERS" = true ]; then
     setup_wallpapers
   else
