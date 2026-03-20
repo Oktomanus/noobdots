@@ -245,7 +245,7 @@ install_packages() {
   FUN_PACKAGES="cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock"
   MEDIA_PACKAGES="imagemagick bluetui mpd mpc rmpc mpv wiremix easyeffects waypaper nwg-look"
   FONTS_PACKAGES="bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji"
-  APPS_PACKAGES="firefox ayugram-desktop fragments zed shotcut inkscape krita gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio"
+  APPS_PACKAGES="firefox joplin ayugram-desktop fragments zed shotcut inkscape krita gimp gmic gimp-plugin-gmic upscayl imv audacity libreoffice obs-studio"
   
   # Объединяем все пакеты для быстрой установки в одну команду. Убран --noconfirm
   ALL_PACKAGES="$CORE_PACKAGES $TERMINAL_PACKAGES $FUN_PACKAGES $MEDIA_PACKAGES $FONTS_PACKAGES $APPS_PACKAGES"
