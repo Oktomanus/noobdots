@@ -2,7 +2,7 @@
   "height": 39,
   "layer": "top",
   "position": "top",
-  "output": "DP-1",
+ // "output": "DP-1",
   "spacing": 7,
 
   "modules-left": [
@@ -45,20 +45,20 @@
   "custom/launcher": {
     "interval": "once",
     "format": "",
-    "on-click": "$TERMINAL -T 'applauncher' exec ~/.config/hypr/scripts/applauncher.py",
-    "on-click-right": "~/.config/hypr/scripts/timer --start",
+    "on-click": "$TERMINAL -T 'applauncher' ~/.config/hypr/scripts/applauncher.py",
+    "on-click-right": "~/.config/hypr/scripts/timer.sh --start",
     "tooltip": false
   },
 
   "custom/timer": {
-    "exec": "~/.config/hypr/scripts/timer --status --json",
+    "exec": "~/.config/hypr/scripts/timer.sh --status --json",
     "return-type": "json",
     "interval": 1,
     "tooltip": false,
-    "on-click": "~/.config/hypr/scripts/timer --add",
-    "on-click-right": "~/.config/hypr/scripts/timer --sub",
-    "on-scroll-up": "~/.config/hypr/scripts/timer --add1",
-    "on-scroll-down": "~/.config/hypr/scripts/timer --sub1"
+    "on-click": "~/.config/hypr/scripts/timer.sh --add",
+    "on-click-right": "~/.config/hypr/scripts/timer.sh --sub",
+    "on-scroll-up": "~/.config/hypr/scripts/timer.sh --add1",
+    "on-scroll-down": "~/.config/hypr/scripts/timer.sh --sub1"
   },
 
   "custom/cpuinfo": {
@@ -66,7 +66,7 @@
     "format": "{}",
     "max-length": 20,
     "tooltip": false,
-    "exec": "~/.config/waybar/cpuinfo",
+    "exec": "~/.config/waybar/cpuinfo.sh",
     "on-click-right": "$TERMINAL -T 'btop' btop -p 0"
   },
 
@@ -135,7 +135,7 @@
     "format": "{icon}{capacity}%",
     "format-icons": [" ", " ", " ", " ", " "],
     "on-click-right": "$TERMINAL -T 'battop' battop ",
-    "on-click": "$TERMINAL -T 'powermode' ~/.config/hypr/scripts/powermode",
+    "on-click": "$TERMINAL -T 'powermode' ~/.config/hypr/scripts/powermode.sh",
     "on-click-middle": "pgrep -x hypridle >/dev/null && (pkill hypridle && notify-send -u low '☕ Caffeine enabled') || (hypridle & notify-send -u low '💤 Sleep enabled')"
   },
 
@@ -158,7 +158,7 @@
 
   "custom/powermenu": {
     "format": "󰐥",
-    "on-click": "$TERMINAL -T 'powermenu' ~/.config/hypr/scripts/powermenu",
+    "on-click": "$TERMINAL -T 'powermenu' ~/.config/hypr/scripts/powermenu.sh",
     "tooltip": false
   },
 
