@@ -241,7 +241,7 @@ install_packages() {
   echo "-------------------------------------------"
 
   CORE_PACKAGES="hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker wl-clipboard waybar mako swww swappy grimblast kooha sddm base-devel udisks2"
-  TERMINAL_PACKAGES="yazi foot fastfetch fish rust btop bat fd battop brightnessctl git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g qalculate-gtk cava lolcat"
+  TERMINAL_PACKAGES="yazi foot fastfetch fish rust btop bat rg fd battop brightnessctl git openssh helix paru duf fzf eza zoxide calcurse impala p7zip ntfs-3g qalculate-gtk cava lolcat"
   FUN_PACKAGES="cmatrix asciiquarium cowsay figlet toilet nyancat sl speedtest-cli tty-clock"
   MEDIA_PACKAGES="imagemagick bluetui mpd mpc rmpc mpv wiremix easyeffects waypaper nwg-look"
   FONTS_PACKAGES="bibata-cursor-theme ttf-ms-fonts ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd noto-fonts noto-fonts-emoji"
