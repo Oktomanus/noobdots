@@ -2,26 +2,27 @@
   "height": 39,
   "layer": "top",
   "position": "top",
- // "output": "DP-1",
+  // "output": "DP-1",
   "spacing": 7,
-
   "modules-left": [
     "battery",
     "custom/cpuinfo",
     "tray",
     "mpd"
   ],
-  "modules-center": ["custom/launcher", "custom/timer"],
+  "modules-center": [
+    "custom/launcher",
+    "custom/timer"
+  ],
   "modules-right": [
     "custom/weather",
     "wireplumber",
-    "network",
+    "group/net",
     "bluetooth",
     "clock",
     "hyprland/language",
     "custom/powermenu"
   ],
-
   "wlr/workspaces": {
     "disable-scroll": true,
     "all-outputs": true,
@@ -29,11 +30,18 @@
     "on-scroll-up": "hyprctl dispatch workspace e+1",
     "on-scroll-down": "hyprctl dispatch workspace e-1",
     "persistent_workspaces": {
-      "1": [], "2": [], "3": [], "4": [], "5": [],
-      "6": [], "7": [], "8": [], "9": [], "10": []
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": [],
+      "6": [],
+      "7": [],
+      "8": [],
+      "9": [],
+      "10": []
     }
   },
-
   "custom/weather": {
     "format": "{}°",
     "tooltip": true,
@@ -41,15 +49,14 @@
     "exec": "~/.config/waybar/wttrbar --hide-conditions --location kyiv",
     "return-type": "json"
   },
-
   "custom/launcher": {
     "interval": "once",
     "format": "",
     "on-click": "$TERMINAL -T 'applauncher' ~/.config/hypr/scripts/applauncher.py",
     "on-click-right": "~/.config/hypr/scripts/timer.sh --start",
+    "on-click-middle": "pgrep -x hypridle >/dev/null && (pkill hypridle && notify-send -u low '☕ Caffeine enabled') || (hypridle & notify-send -u low '💤 Sleep enabled')",
     "tooltip": false
   },
-
   "custom/timer": {
     "exec": "~/.config/hypr/scripts/timer.sh --status --json",
     "return-type": "json",
@@ -60,7 +67,6 @@
     "on-scroll-up": "~/.config/hypr/scripts/timer.sh --add1",
     "on-scroll-down": "~/.config/hypr/scripts/timer.sh --sub1"
   },
-
   "custom/cpuinfo": {
     "interval": 5,
     "format": "{}",
@@ -69,24 +75,34 @@
     "exec": "~/.config/waybar/cpuinfo.sh",
     "on-click-right": "$TERMINAL -T 'btop' btop -p 0"
   },
-
   "mpd": {
     "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}({elapsedTime:%M:%S}) ",
     "format-disconnected": "",
     "format-stopped": "",
     "interval": 10,
-    "consume-icons": { "on": " " },
-    "random-icons": { "off": "<span color=\"#f53c3c\"></span> ", "on": " " },
-    "repeat-icons": { "on": " " },
-    "single-icons": { "on": "1 " },
-    "state-icons": { "paused": "", "playing": "" },
+    "consume-icons": {
+      "on": " "
+    },
+    "random-icons": {
+      "off": "<span color=\"#f53c3c\"></span> ",
+      "on": " "
+    },
+    "repeat-icons": {
+      "on": " "
+    },
+    "single-icons": {
+      "on": "1 "
+    },
+    "state-icons": {
+      "paused": "",
+      "playing": ""
+    },
     "tooltip": false,
     "on-click": "mpc toggle",
     "on-click-right": "mpc stop",
     "on-scroll-up": "mpc volume +2",
     "on-scroll-down": "mpc volume -2"
   },
-
   "wireplumber": {
     "format": "{icon} {volume}%",
     "format-bluetooth": "{icon} {volume}% {format_source}",
@@ -99,14 +115,17 @@
       "phone": "",
       "portable": "",
       "car": "",
-      "default": ["", "", ""]
+      "default": [
+        "",
+        "",
+        ""
+      ]
     },
     "on-click-right": "$TERMINAL -T 'wiremix' wiremix",
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
     "on-click-middle": "helvum",
     "tooltip": false
   },
-
   "network": {
     "format": "{ifname}",
     "format-wifi": "󰖩 {signalStrength}%",
@@ -117,7 +136,26 @@
     "format-alt": " {bandwidthUpBits} |  {bandwidthDownBits}",
     "on-click-right": "$TERMINAL -T 'impala' impala"
   },
-
+  "group/net": {
+    "orientation": "horizontal",
+    "drawer": {
+      "transition-duration": 500,
+      "children-class": "net-child",
+      "transition-left-to-right": true,
+      "click-to-reveal": false
+    },
+    "modules": [
+      "network",
+      "custom/vpn"
+    ]
+  },
+  "custom/vpn": {
+    "format": "{}",
+    "exec": "nmcli connection show --active | grep -q proton && echo '󰦝 ' || echo '󰦞 '",
+    "on-click": "nmcli connection show --active | grep -q proton && nmcli connection down proton || nmcli connection up proton",
+    "interval": 5,
+    "tooltip": false
+  },
   "bluetooth": {
     "format": "󰂯",
     "format-disabled": "",
@@ -125,20 +163,26 @@
     "tooltip": false,
     "on-click-right": "$TERMINAL -T 'bluetui' bluetui"
   },
-
   "battery": {
     "bat": "BAT0",
     "adapter": "ADP0",
     "interval": 60,
-    "states": { "warning": 30, "critical": 15 },
+    "states": {
+      "warning": 30,
+      "critical": 15
+    },
     "max-length": 20,
     "format": "{icon}{capacity}%",
-    "format-icons": [" ", " ", " ", " ", " "],
+    "format-icons": [
+      " ",
+      " ",
+      " ",
+      " ",
+      " "
+    ],
     "on-click-right": "$TERMINAL -T 'battop' battop ",
-    "on-click": "$TERMINAL -T 'powermode' ~/.config/hypr/scripts/powermode.sh",
-    "on-click-middle": "pgrep -x hypridle >/dev/null && (pkill hypridle && notify-send -u low '☕ Caffeine enabled') || (hypridle & notify-send -u low '💤 Sleep enabled')"
+    "on-click": "$TERMINAL -T 'powermode' ~/.config/hypr/scripts/powermode.sh"
   },
-
   "clock": {
     "format-alt": " {:%d.%m.%y}",
     "format": "󰥔 {:%H:%M}",
@@ -155,13 +199,11 @@
     },
     "on-click-right": "$TERMINAL -T 'calcurse' calcurse"
   },
-
   "custom/powermenu": {
     "format": "󰐥",
     "on-click": "$TERMINAL -T 'powermenu' ~/.config/hypr/scripts/powermenu.sh",
     "tooltip": false
   },
-
   "hyprland/language": {
     "format": "{}",
     "format-en": "🇺🇸",
