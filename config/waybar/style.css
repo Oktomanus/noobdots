@@ -53,6 +53,7 @@ window#waybar.hidden {
 #temperature,
 #backlight,
 #network,
+#custom-vpn,
 #bluetooth,
 #wireplumber,
 #custom-powermenu,
@@ -87,8 +88,36 @@ window#waybar.hidden {
     background-color: @teal;
 }
 
-#network {
+#network,
+#custom-vpn {
     background-color: @green;
+}
+
+/* Стили для группы, чтобы она выглядела как единая капсула */
+#workspaces, #taskbar, #group-net {
+    border-radius: 8px;
+    margin: 7px 0px;
+}
+
+#group-net {
+    background-color: @green;
+    padding: 0 5px;
+}
+
+#group-net #network {
+    margin-right: 0;
+    padding: 0 6px;
+}
+
+#group-net #custom-vpn {
+    margin-left: 0;
+    padding: 0 6px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Анимация появления */
+.net-child {
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #battery {
@@ -102,6 +131,8 @@ window#waybar.hidden {
 #custom-timer {
     background-color: @maroon;
 }
+
+
 
 #custom-powermenu {
     margin: 7px 7px 7px 0px;
