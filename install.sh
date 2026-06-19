@@ -184,7 +184,7 @@ install_packages() {
   "
 
   APPS="
-    firefox inkscape krita gimp gmic gimp-plugin-gmic
+    firefox inkscape krita gimp gmic gimp-plugin-gmic kdenlive
     imv audacity libreoffice obs-studio zed fragments kooha swappy
   "
 
