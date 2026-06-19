@@ -276,7 +276,7 @@ configure_login_manager() {
   fi
 
   run_cmd "Enabling ly.service" \
-    "sudo systemctl enable ly.service"
+    "sudo systemctl enable ly@tty2.service"
 
   print_success "ly login manager configured"
 }
