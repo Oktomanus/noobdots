@@ -236,8 +236,9 @@ install_aur_packages() {
   # Убираем переносы строк с помощью echo
   AUR_PACKAGES=$(echo $AUR_PACKAGES)
 
+  # ВАЖНО: Убрали флаг --noconfirm, теперь paru будет спрашивать варианты (1, 2, 3...)
   run_cmd "Installing AUR packages" \
-    "paru -S --needed --noconfirm $AUR_PACKAGES"
+    "paru -S --needed $AUR_PACKAGES"
 }
 
 # -----------------------------------------------------------------------------
