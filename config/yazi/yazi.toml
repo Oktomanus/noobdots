@@ -1,8 +1,0 @@
-[[opener.play]]
-run = 'mpv --no-video --msg-level=all=status --term-osd-bar "$@" && clear'
-block = true
-desc = "Listen"
-
-[[open.rules]]
-mime = "audio/*"
-use = "play"
