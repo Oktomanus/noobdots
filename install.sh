@@ -115,7 +115,7 @@ configure_shell() {
 
 setup_noobdots() {
   if [ ! -d "$HOME/noobdots" ]; then
-    run_cmd "Cloning noobdots repository" "git clone '$NOOBDOTS_REPO' '$HOME/noobdots'"
+    run_cmd "Cloning noobdots repository" "git clone --depth 1 --single-branch '$NOOBDOTS_REPO' '$HOME/noobdots'"
   fi
 
   if [ -d "$HOME/noobdots/config" ]; then
