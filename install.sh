@@ -2,7 +2,7 @@
 
 # =============================================================================
 #  Arch Linux Hyprland Installation Script
-#  Optimized for AMD Ryzen 7000 series (Zen 4 / v4 / Radeon Graphics)
+#  Auto-detects CPU architecture via CachyOS & asks for GPU drivers
 # =============================================================================
 
 set -e
@@ -31,7 +31,7 @@ NOOBDOTS_REPO="https://github.com/Oktomanus/noobdots"
 print_banner() {
   echo -e "${CYAN}"
   echo "=============================================="
-  echo "   Arch Linux Hyprland Setup (AMD Zen 4)      "
+  echo "   Arch Linux Hyprland Setup                  "
   echo "=============================================="
   echo -e "${NC}"
 }
@@ -88,7 +88,14 @@ run_cmd() {
 
 ask_questions() {
   echo -e "${YELLOW}This script will set up a Hyprland desktop on Arch Linux.${NC}"
-  echo -e "${CYAN}Target CPU: AMD Ryzen 7540U (Auto-detecting v4 / AVX-512)${NC}"
+  echo ""
+
+  echo -e "${CYAN}GPU Drivers${NC}"
+  read -p "Do you have an NVIDIA GPU? (If no, AMD drivers will be installed) [y/N]: " nvidia_choice
+  case "$nvidia_choice" in
+    [Yy]*) HAS_NVIDIA=true;  print_success "GPU: NVIDIA" ;;
+    *)     HAS_NVIDIA=false; print_success "GPU: AMD" ;;
+  esac
   echo ""
 
   echo -e "${CYAN}AUR Packages${NC}"
@@ -119,7 +126,7 @@ configure_pacman() {
 }
 
 # -----------------------------------------------------------------------------
-#  CachyOS Repositories Setup (Auto-detects v4)
+#  CachyOS Repositories Setup
 # -----------------------------------------------------------------------------
 
 add_cachyos_repo() {
@@ -128,8 +135,8 @@ add_cachyos_repo() {
   local tmp_dir
   tmp_dir="$(mktemp -d /tmp/cachyos-repo.XXXXXX)"
 
-  run_cmd "Downloading and running CachyOS repo script (Will detect AVX-512)" \
-    "cd '$tmp_dir' && curl -O https://mirror.cachyos.org/cachyos-repo.tar.xz && tar xvf cachyos-repo.tar.xz && cd cachyos-repo && sudo bash cachyos-repo.sh"
+  run_cmd "Downloading and running CachyOS repo script (Auto-detects CPU arch)" \
+    "cd '$tmp_dir' && curl -O https://mirror.cachyos.org/cachyos-repo.tar.xz && tar xvf cachyos-repo.tar.xz && cd cachyos-repo && sudo ./cachyos-repo.sh"
 
   rm -rf "$tmp_dir"
 }
@@ -151,10 +158,11 @@ update_system() {
 install_packages() {
   print_step "Installing core, apps, and CachyOS pre-compiled packages"
 
-  # Драйверы для твоей встроенной видеокарты AMD Radeon 740M
-  AMD_DRIVERS="
-    mesa vulkan-radeon libva-mesa-driver amd-ucode xf86-video-amdgpu
-  "
+  if [ "$HAS_NVIDIA" = true ]; then
+    DRIVERS="nvidia-dkms nvidia-utils egl-wayland"
+  else
+    DRIVERS="mesa vulkan-radeon libva-mesa-driver amd-ucode xf86-video-amdgpu"
+  fi
 
   CORE="
     hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker hyprshot
@@ -190,10 +198,9 @@ install_packages() {
     paru joplin ayugram-desktop waypaper tty-clock
   "
 
-  ALL_PACKAGES=$(echo $AMD_DRIVERS $CORE $TERMINAL $FUN $MEDIA $FONTS $APPS $CACHY_REPO)
+  ALL_PACKAGES=$(echo $DRIVERS $CORE $TERMINAL $FUN $MEDIA $FONTS $APPS $CACHY_REPO)
 
-  # ВАЖНО: Флаг --noconfirm УБРАН! 
-  # Теперь если pacman спросит "cachyos-extra-v3 или extra?", ты сможешь выбрать v3!
+  # Флаг --needed предотвращает скачивание уже установленных пакетов
   run_cmd "Installing all packages via pacman (Interactive mode)" \
     "sudo pacman -S --needed $ALL_PACKAGES"
 }
@@ -283,8 +290,13 @@ setup_noobdots() {
     print_success "noobdots already cloned"
   fi
 
-  run_cmd "Copying config files to ~/.config" \
-    "mkdir -p '$HOME/.config' && cp -r '$HOME/noobdots/config/'* '$HOME/.config/'"
+  if [ -d "$HOME/noobdots/config" ]; then
+    run_cmd "Copying config folder contents to ~/.config" \
+      "mkdir -p \"\$HOME/.config\" && cp -a \"\$HOME/noobdots/config/.\" \"\$HOME/.config/\""
+  else
+    run_cmd "Copying root contents to ~/.config" \
+      "mkdir -p \"\$HOME/.config\" && cp -a \"\$HOME/noobdots/\"* \"\$HOME/.config/\""
+  fi
 }
 
 # -----------------------------------------------------------------------------
@@ -317,13 +329,13 @@ main() {
   # 1. Pacman tuning
   configure_pacman
 
-  # 2. Add CachyOS Repositories (Auto-detects v4)
+  # 2. Add CachyOS Repositories
   add_cachyos_repo
 
   # 3. System update
   update_system
 
-  # 4. Official repo + CachyOS packages + AMD Drivers
+  # 4. Official repo + CachyOS packages + Drivers
   install_packages
 
   # 5. Extra AUR packages (if requested)
