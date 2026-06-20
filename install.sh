@@ -56,7 +56,7 @@ configure_pacman() {
 
 add_cachyos_repo() {
   run_cmd "Adding CachyOS repositories" \
-    "wget -qO- https://raw.githubusercontent.com/cachyos/cachyos-repo-manager/master/cachyos-repo-not-cachyos.sh | sudo bash"
+    "curl -sL https://raw.githubusercontent.com/cachyos/cachyos-repo-manager/master/cachyos-repo-not-cachyos.sh | sudo bash"
 }
 
 update_system() {
