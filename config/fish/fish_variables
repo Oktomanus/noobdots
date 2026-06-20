@@ -1,7 +1,0 @@
-# This file contains fish universal variable definitions.
-# VERSION: 3.0
-SETUVAR --export EDITOR:helix
-SETUVAR --export TERMINAL:foot
-SETUVAR --export VISUAL:helix
-SETUVAR __fish_initialized:4300
-SETUVAR fish_user_paths:/home/vex/\x2ecargo/bin
