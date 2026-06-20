@@ -55,8 +55,11 @@ configure_pacman() {
 }
 
 add_cachyos_repo() {
+  local tmp_dir
+  tmp_dir="$(mktemp -d /tmp/cachyos-repo.XXXXXX)"
   run_cmd "Adding CachyOS repositories" \
-    "curl -sL https://raw.githubusercontent.com/cachyos/cachyos-repo-manager/master/cachyos-repo-not-cachyos.sh | sudo bash"
+    "( cd \"$tmp_dir\" && curl -L https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz && tar xvf cachyos-repo.tar.xz && cd cachyos-repo && sudo ./cachyos-repo.sh )"
+  rm -rf "$tmp_dir"
 }
 
 update_system() {
