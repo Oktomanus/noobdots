@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # =============================================================================
-#  Arch Linux Hyprland Installation Script
+#  Arch Linux Hyprland Installation Script (with CachyOS Repos)
 #  Automated setup for a complete Hyprland desktop environment
 # =============================================================================
 
@@ -23,7 +23,6 @@ NC="\033[0m"
 # -----------------------------------------------------------------------------
 PACMAN_CONF="/etc/pacman.conf"
 NOOBDOTS_REPO="https://github.com/Oktomanus/noobdots"
-PARU_REPO="https://aur.archlinux.org/paru.git"
 
 # -----------------------------------------------------------------------------
 #  Helper Functions
@@ -105,6 +104,14 @@ ask_questions() {
     *)     INSTALL_NVIDIA=false; print_warning "NVIDIA drivers: no"  ;;
   esac
   echo ""
+
+  echo -e "${CYAN}AUR Packages${NC}"
+  read -p "Install extra AUR packages (themes, cursor, upscayl)? [Y/n]: " aur_choice
+  case "$aur_choice" in
+    [Nn]*) INSTALL_AUR=false; print_warning "AUR packages: skipped" ;;
+    *)     INSTALL_AUR=true;  print_success "AUR packages: yes" ;;
+  esac
+  echo ""
 }
 
 # -----------------------------------------------------------------------------
@@ -131,6 +138,23 @@ configure_pacman() {
 }
 
 # -----------------------------------------------------------------------------
+#  CachyOS Repositories Setup
+# -----------------------------------------------------------------------------
+
+add_cachyos_repo() {
+  print_step "Adding CachyOS Repositories"
+  
+  local tmp_dir
+  tmp_dir="$(mktemp -d /tmp/cachyos-repo.XXXXXX)"
+
+  run_cmd "Downloading and running CachyOS repo script" \
+    "cd '$tmp_dir' && curl -O https://mirror.cachyos.org/cachyos-repo.tar.xz && tar xvf cachyos-repo.tar.xz && cd cachyos-repo && sudo bash cachyos-repo.sh"
+
+  rm -rf "$tmp_dir"
+  print_success "CachyOS repositories added successfully"
+}
+
+# -----------------------------------------------------------------------------
 #  System Update
 # -----------------------------------------------------------------------------
 
@@ -151,11 +175,11 @@ install_nvidia() {
 }
 
 # -----------------------------------------------------------------------------
-#  Package Installation (official repos)
+#  Package Installation (Official + CachyOS)
 # -----------------------------------------------------------------------------
 
 install_packages() {
-  print_step "Installing packages from official repositories"
+  print_step "Installing core, apps, and CachyOS/AUR pre-compiled packages"
 
   CORE="
     hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker hyprshot
@@ -187,37 +211,15 @@ install_packages() {
     imv audacity libreoffice obs-studio zed fragments kooha swappy
   "
 
-  # Убираем переносы строк с помощью echo
-  ALL_PACKAGES=$(echo $CORE $TERMINAL $FUN $MEDIA $FONTS $APPS)
+  CACHY_REPO="
+    paru joplin ayugram-desktop waypaper tty-clock
+  "
 
-  run_cmd "Installing all official packages" \
+  # Убираем переносы строк
+  ALL_PACKAGES=$(echo $CORE $TERMINAL $FUN $MEDIA $FONTS $APPS $CACHY_REPO)
+
+  run_cmd "Installing all packages via pacman" \
     "sudo pacman -S --needed --noconfirm $ALL_PACKAGES"
-}
-
-# -----------------------------------------------------------------------------
-#  Build & Install paru from source
-# -----------------------------------------------------------------------------
-
-install_paru() {
-  print_step "Installing paru (AUR helper)"
-
-  if has_cmd paru; then
-    print_success "paru is already installed"
-    return 0
-  fi
-
-  local build_dir
-  build_dir="$(mktemp -d /tmp/paru-build.XXXXXX)"
-
-  run_cmd "Cloning paru from AUR" \
-    "git clone '$PARU_REPO' '$build_dir/paru'"
-
-  run_cmd "Building and installing paru" \
-    "cd '$build_dir/paru' && makepkg -si --noconfirm --needed"
-
-  # Cleanup build artifacts
-  rm -rf "$build_dir"
-  print_success "Cleaned up paru build directory"
 }
 
 # -----------------------------------------------------------------------------
@@ -225,19 +227,16 @@ install_paru() {
 # -----------------------------------------------------------------------------
 
 install_aur_packages() {
-  print_step "Installing AUR packages via paru"
+  print_step "Installing remaining AUR packages via paru"
 
   AUR_PACKAGES="
-    battop tty-clock pipes.sh waypaper joplin-desktop
-    upscayl bibata-cursor-theme ayugram-desktop
+    battop pipes.sh upscayl bibata-cursor-theme
     catppuccin-gtk-theme-mocha catppuccin-gtk-theme-latte
   "
 
-  # Убираем переносы строк с помощью echo
   AUR_PACKAGES=$(echo $AUR_PACKAGES)
 
-  # ВАЖНО: Убрали флаг --noconfirm, теперь paru будет спрашивать варианты (1, 2, 3...)
-  run_cmd "Installing AUR packages" \
+  run_cmd "Installing extra AUR packages" \
     "paru -S --needed $AUR_PACKAGES"
 }
 
@@ -262,7 +261,6 @@ install_yazi_plugins() {
 configure_login_manager() {
   print_step "Configuring ly login manager"
 
-  # Disable any existing display managers that might conflict
   for dm in gdm sddm lightdm lxdm; do
     if systemctl is-enabled "${dm}.service" >/dev/null 2>&1; then
       run_cmd "Disabling conflicting ${dm}.service" \
@@ -270,7 +268,6 @@ configure_login_manager() {
     fi
   done
 
-  # Disable getty on tty2 (ly will use it by default)
   if systemctl is-enabled getty@tty2.service >/dev/null 2>&1; then
     run_cmd "Disabling getty@tty2.service (ly takes over)" \
       "sudo systemctl disable getty@tty2.service"
@@ -343,30 +340,36 @@ main() {
   print_banner
   ask_questions
 
-  # 1. Pacman tuning & system update
+  # 1. Pacman tuning
   configure_pacman
+
+  # 2. Add CachyOS Repositories
+  add_cachyos_repo
+
+  # 3. System update (refresh repos with CachyOS)
   update_system
 
-  # 2. NVIDIA (if requested)
+  # 4. NVIDIA (if requested)
   if [ "$INSTALL_NVIDIA" = true ]; then
     install_nvidia
   fi
 
-  # 3. Official repo packages
+  # 5. Official repo + CachyOS packages (including paru)
   install_packages
 
-  # 4. Build paru, then AUR packages
-  install_paru
-  install_aur_packages
+  # 6. Extra AUR packages (if requested)
+  if [ "$INSTALL_AUR" = true ]; then
+    install_aur_packages
+  fi
 
-  # 5. Yazi plugins
+  # 7. Yazi plugins
   install_yazi_plugins
 
-  # 6. Login manager & shell
+  # 8. Login manager & shell
   configure_login_manager
   configure_shell
 
-  # 7. Dotfiles
+  # 9. Dotfiles
   setup_noobdots
 
   # Done
