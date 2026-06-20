@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 GREEN="\033[0;32m"
@@ -55,11 +55,8 @@ configure_pacman() {
 }
 
 add_cachyos_repo() {
-  local tmp_dir
-  tmp_dir="$(mktemp -d /tmp/cachyos-repo.XXXXXX)"
   run_cmd "Adding CachyOS repositories" \
-    "cd '$tmp_dir' && curl -O https://mirror.cachyos.org/cachyos-repo.tar.xz && tar xvf cachyos-repo.tar.xz && cd cachyos-repo && sudo ./cachyos-repo.sh"
-  rm -rf "$tmp_dir"
+    "wget -qO- https://raw.githubusercontent.com/cachyos/cachyos-repo-manager/master/cachyos-repo-not-cachyos.sh | sudo bash"
 }
 
 update_system() {
@@ -91,7 +88,7 @@ install_aur_packages() {
 }
 
 install_yazi_plugins() {
-  run_cmd "Installing Yazi plugins" "yes | ya pkg add yazi-rs/plugins:mount && yes | ya pkg add yazi-rs/plugins:chmod"
+  run_cmd "Installing Yazi plugins" "ya pack -a yazi-rs/plugins:mount && ya pack -a yazi-rs/plugins:chmod"
 }
 
 configure_login_manager() {
@@ -121,7 +118,7 @@ setup_noobdots() {
   if [ -d "$HOME/noobdots/config" ]; then
     mkdir -p "$HOME/.config" && cp -a "$HOME/noobdots/config/." "$HOME/.config/"
   else
-    mkdir -p "$HOME/.config" && cp -a "$HOME/noobdots/"* "$HOME/.config/"
+    mkdir -p "$HOME/.config" && cp -a "$HOME/noobdots/." "$HOME/.config/"
   fi
 }
 
