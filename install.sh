@@ -91,7 +91,7 @@ install_aur_packages() {
 }
 
 install_yazi_plugins() {
-  run_cmd "Installing Yazi plugins" "ya pack -a yazi-rs/plugins:mount && ya pack -a yazi-rs/plugins:chmod"
+  run_cmd "Installing Yazi plugins" "ya pkg add yazi-rs/plugins:mount yazi-rs/plugins:chmod"
 }
 
 configure_login_manager() {
