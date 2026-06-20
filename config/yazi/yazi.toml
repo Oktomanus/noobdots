@@ -1,0 +1,24 @@
+[opener]
+listen = [
+    { run = 'clear && mpv --no-video --msg-level=all=status --term-osd-bar "$@"', block = true, desc = "Listen" }
+]
+edit-audio = [
+    { run = 'audacity "$@"', orphan = true, desc = "Edit" }
+]
+edit-img = [
+    { run = 'gimp "$@"', orphan = true, desc = "Edit" }
+]
+edit-video = [
+    { run = 'kdenlive "$@"', orphan = true, desc = "Edit" }
+]
+web = [
+    { run = 'xdg-open "$@"', orphan = true, desc = "Browser" }
+]
+
+[open]
+prepend_rules = [
+    { mime = "text/html", use = [ "web", "edit", "reveal" ] },
+    { mime = "audio/*", use = [ "listen", "edit-audio", "reveal" ] },
+    { mime = "image/*", use = [ "open", "edit-img", "reveal" ] },
+    { mime = "video/*", use = [ "open", "edit-video", "reveal" ] }
+]

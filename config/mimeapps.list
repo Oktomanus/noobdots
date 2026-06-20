@@ -1,0 +1,10 @@
+[Default Applications]
+
+x-scheme-handler/unknown=firefox.desktop
+
+image/jpeg=imv-dir.desktop
+image/png=imv-dir.desktop
+image/gif=imv-dir.desktop
+image/webp=imv-dir.desktop
+audio/flac=mpv.desktop
+video/webm=mpv.desktop
