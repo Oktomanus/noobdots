@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # =============================================================================
-#  Arch Linux Hyprland Installation Script (with CachyOS Repos)
-#  Automated setup for a complete Hyprland desktop environment
+#  Arch Linux Hyprland Installation Script
+#  Optimized for AMD Ryzen 7000 series (Zen 4 / v4 / Radeon Graphics)
 # =============================================================================
 
 set -e
@@ -31,7 +31,7 @@ NOOBDOTS_REPO="https://github.com/Oktomanus/noobdots"
 print_banner() {
   echo -e "${CYAN}"
   echo "=============================================="
-  echo "   Arch Linux Hyprland Installation Script    "
+  echo "   Arch Linux Hyprland Setup (AMD Zen 4)      "
   echo "=============================================="
   echo -e "${NC}"
 }
@@ -56,7 +56,6 @@ print_warning() {
   echo -e "  ${YELLOW}!${NC} ${YELLOW}$1${NC}" >&2
 }
 
-# Robust command runner with retry/skip/abort on failure
 run_cmd() {
   local description="$1"
   shift
@@ -83,26 +82,13 @@ run_cmd() {
   done
 }
 
-# Check if a command exists
-has_cmd() {
-  command -v "$1" >/dev/null 2>&1
-}
-
 # -----------------------------------------------------------------------------
 #  Pre-flight Questions
 # -----------------------------------------------------------------------------
 
 ask_questions() {
   echo -e "${YELLOW}This script will set up a Hyprland desktop on Arch Linux.${NC}"
-  echo -e "${YELLOW}On failure, you can retry, skip, or abort each step.${NC}"
-  echo ""
-
-  echo -e "${CYAN}NVIDIA Drivers${NC}"
-  read -p "Install NVIDIA GPU drivers? [y/N]: " nvidia_choice
-  case "$nvidia_choice" in
-    [Yy]*) INSTALL_NVIDIA=true;  print_success "NVIDIA drivers: yes" ;;
-    *)     INSTALL_NVIDIA=false; print_warning "NVIDIA drivers: no"  ;;
-  esac
+  echo -e "${CYAN}Target CPU: AMD Ryzen 7540U (Auto-detecting v4 / AVX-512)${NC}"
   echo ""
 
   echo -e "${CYAN}AUR Packages${NC}"
@@ -124,21 +110,16 @@ configure_pacman() {
   if ! grep -q "^ILoveCandy" "$PACMAN_CONF"; then
     sudo sed -i '/^\[options\]/a ILoveCandy' "$PACMAN_CONF"
     print_success "Enabled ILoveCandy"
-  else
-    print_success "ILoveCandy already set"
   fi
 
   if grep -q "^#ParallelDownloads" "$PACMAN_CONF"; then
     sudo sed -i 's/^#ParallelDownloads.*/ParallelDownloads = 10/' "$PACMAN_CONF"
     print_success "Enabled ParallelDownloads = 10"
-  elif grep -q "^ParallelDownloads" "$PACMAN_CONF"; then
-    sudo sed -i 's/^ParallelDownloads.*/ParallelDownloads = 10/' "$PACMAN_CONF"
-    print_success "ParallelDownloads already configured"
   fi
 }
 
 # -----------------------------------------------------------------------------
-#  CachyOS Repositories Setup
+#  CachyOS Repositories Setup (Auto-detects v4)
 # -----------------------------------------------------------------------------
 
 add_cachyos_repo() {
@@ -147,11 +128,10 @@ add_cachyos_repo() {
   local tmp_dir
   tmp_dir="$(mktemp -d /tmp/cachyos-repo.XXXXXX)"
 
-  run_cmd "Downloading and running CachyOS repo script" \
+  run_cmd "Downloading and running CachyOS repo script (Will detect AVX-512)" \
     "cd '$tmp_dir' && curl -O https://mirror.cachyos.org/cachyos-repo.tar.xz && tar xvf cachyos-repo.tar.xz && cd cachyos-repo && sudo bash cachyos-repo.sh"
 
   rm -rf "$tmp_dir"
-  print_success "CachyOS repositories added successfully"
 }
 
 # -----------------------------------------------------------------------------
@@ -161,25 +141,20 @@ add_cachyos_repo() {
 update_system() {
   print_step "Full system update"
   run_cmd "Syncing databases and upgrading packages" \
-    "sudo pacman -Syu --noconfirm"
+    "sudo pacman -Syu"
 }
 
 # -----------------------------------------------------------------------------
-#  NVIDIA Drivers
-# -----------------------------------------------------------------------------
-
-install_nvidia() {
-  print_step "Installing NVIDIA drivers"
-  run_cmd "Installing nvidia-open, nvidia-settings, libva-nvidia-driver, cuda" \
-    "sudo pacman -S --needed --noconfirm nvidia-open nvidia-settings libva-nvidia-driver cuda"
-}
-
-# -----------------------------------------------------------------------------
-#  Package Installation (Official + CachyOS)
+#  Package Installation
 # -----------------------------------------------------------------------------
 
 install_packages() {
-  print_step "Installing core, apps, and CachyOS/AUR pre-compiled packages"
+  print_step "Installing core, apps, and CachyOS pre-compiled packages"
+
+  # Драйверы для твоей встроенной видеокарты AMD Radeon 740M
+  AMD_DRIVERS="
+    mesa vulkan-radeon libva-mesa-driver amd-ucode xf86-video-amdgpu
+  "
 
   CORE="
     hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker hyprshot
@@ -215,11 +190,12 @@ install_packages() {
     paru joplin ayugram-desktop waypaper tty-clock
   "
 
-  # Убираем переносы строк
-  ALL_PACKAGES=$(echo $CORE $TERMINAL $FUN $MEDIA $FONTS $APPS $CACHY_REPO)
+  ALL_PACKAGES=$(echo $AMD_DRIVERS $CORE $TERMINAL $FUN $MEDIA $FONTS $APPS $CACHY_REPO)
 
-  run_cmd "Installing all packages via pacman" \
-    "sudo pacman -S --needed --noconfirm $ALL_PACKAGES"
+  # ВАЖНО: Флаг --noconfirm УБРАН! 
+  # Теперь если pacman спросит "cachyos-extra-v3 или extra?", ты сможешь выбрать v3!
+  run_cmd "Installing all packages via pacman (Interactive mode)" \
+    "sudo pacman -S --needed $ALL_PACKAGES"
 }
 
 # -----------------------------------------------------------------------------
@@ -269,14 +245,12 @@ configure_login_manager() {
   done
 
   if systemctl is-enabled getty@tty2.service >/dev/null 2>&1; then
-    run_cmd "Disabling getty@tty2.service (ly takes over)" \
+    run_cmd "Disabling getty@tty2.service" \
       "sudo systemctl disable getty@tty2.service"
   fi
 
   run_cmd "Enabling ly.service" \
     "sudo systemctl enable ly@tty2.service"
-
-  print_success "ly login manager configured"
 }
 
 # -----------------------------------------------------------------------------
@@ -343,33 +317,28 @@ main() {
   # 1. Pacman tuning
   configure_pacman
 
-  # 2. Add CachyOS Repositories
+  # 2. Add CachyOS Repositories (Auto-detects v4)
   add_cachyos_repo
 
-  # 3. System update (refresh repos with CachyOS)
+  # 3. System update
   update_system
 
-  # 4. NVIDIA (if requested)
-  if [ "$INSTALL_NVIDIA" = true ]; then
-    install_nvidia
-  fi
-
-  # 5. Official repo + CachyOS packages (including paru)
+  # 4. Official repo + CachyOS packages + AMD Drivers
   install_packages
 
-  # 6. Extra AUR packages (if requested)
+  # 5. Extra AUR packages (if requested)
   if [ "$INSTALL_AUR" = true ]; then
     install_aur_packages
   fi
 
-  # 7. Yazi plugins
+  # 6. Yazi plugins
   install_yazi_plugins
 
-  # 8. Login manager & shell
+  # 7. Login manager & shell
   configure_login_manager
   configure_shell
 
-  # 9. Dotfiles
+  # 8. Dotfiles
   setup_noobdots
 
   # Done
