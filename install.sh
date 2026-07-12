@@ -74,12 +74,12 @@ install_packages() {
   fi
 
   CORE="hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker hyprshot waybar mako ly base-devel udisks2"
-  TERMINAL="yazi foot fastfetch fish tmux btop bat ripgrep fd brightnessctl git openssh helix duf fzf eza zoxide calcurse 7zip libqalculate cava lolcat bluetui impala gping trippy s-tui speedtest-cli"
+  TERMINAL="yazi foot fastfetch fish tmux btop bat ripgrep fd brightnessctl git openssh helix duf fzf eza zoxide calcurse 7zip libqalculate cava lolcat bluetui impala gping rustnet trippy s-tui speedtest-cli"
   FUN="cmatrix cowsay figlet toilet sl asciiquarium nyancat"
   MEDIA="imagemagick awww mpd mpc mpv easyeffects nwg-look wiremix rmpc"
   FONTS="ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-dejavu-nerd"
-  APPS="firefox inkscape krita gimp gmic gimp-plugin-gmic imv audacity libreoffice obs-studio zed fragments kooha swappy"
-  CACHY_REPO="paru joplin ayugram-desktop waypaper tty-clock"
+  APPS="librewolf inkscape krita gimp gmic gimp-plugin-gmic imv audacity libreoffice obs-studio zed fragments kooha swappy"
+  CACHY_REPO="paru joplin telegram-desktop waypaper tty-clock"
 
   ALL_PACKAGES=$(echo $DRIVERS $CORE $TERMINAL $FUN $MEDIA $FONTS $APPS $CACHY_REPO)
   run_cmd "Installing official and CachyOS packages" "sudo pacman -S --needed $ALL_PACKAGES"
