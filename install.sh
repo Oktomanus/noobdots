@@ -68,9 +68,9 @@ update_system() {
 
 install_packages() {
   if [ "$HAS_NVIDIA" = true ]; then
-    DRIVERS="nvidia-dkms nvidia-utils egl-wayland"
+    DRIVERS="nvidia-open nvidia-utils egl-wayland"
   else
-    DRIVERS="mesa vulkan-radeon libva-mesa-driver amd-ucode xf86-video-amdgpu"
+    DRIVERS="vulkan-radeon amd-ucode xf86-video-amdgpu"
   fi
 
   CORE="hyprland xdg-desktop-portal-hyprland hyprlock hypridle hyprpicker hyprshot waybar mako ly base-devel udisks2"
